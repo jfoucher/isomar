@@ -1,0 +1,12 @@
+capes.json.gz: the named capes and points of OpenStreetMap (natural=cape, and the localities and points
+named as capes), with their positions and whether they have a Wikidata entry; coves.json.gz: the named
+bays and coves of OpenStreetMap (natural=bay, water=cove), the same way. Both as built by
+`cargo xtask capes` from `scripts/fetch-osm-capes.sh`.
+
+© OpenStreetMap contributors. This database is made available under the Open Database License (ODbL)
+1.0: https://opendatacommons.org/licenses/odbl/1-0/. You are free to copy, distribute and adapt it, as
+long as you credit OpenStreetMap and its contributors and share any adapted database under the ODbL.
+See https://www.openstreetmap.org/copyright.
+
+The chart credits OpenStreetMap on screen wherever these names are drawn: they are only drawn where the
+OpenFreeMap tiles (OpenStreetMap data) are, whose credit is shown.

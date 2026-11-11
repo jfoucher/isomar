@@ -1,0 +1,13 @@
+[package]
+name = "isomar-android"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "The JNI door of the Android shell into isomar-ffi"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+isomar-ffi = { path = "../isomar-ffi" }
+jni = "0.21.1"

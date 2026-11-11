@@ -1,0 +1,30 @@
+[package]
+name = "isomar"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "A native GNOME chart plotter for sailors"
+
+[dependencies]
+isomar-core = { path = "../isomar-core" }
+isomar-app = { path = "../isomar-app" }
+adw = { version = "0.9.2", package = "libadwaita", features = ["v1_7"] }
+async-channel.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+gtk = { version = "0.11.5", package = "gtk4", features = ["v4_18"] }
+cairo = { version = "0.22", package = "cairo-rs" }
+pango = "0.22"
+pangocairo = "0.22"
+rayon.workspace = true
+rusqlite.workspace = true
+serde_json.workspace = true
+zip.workspace = true
+
+[dev-dependencies]
+isomar-core = { path = "../isomar-core", features = ["testutil"] }
+tempfile.workspace = true
+
+[build-dependencies]
+serde_json.workspace = true
+glib-build-tools = "0.22.8"

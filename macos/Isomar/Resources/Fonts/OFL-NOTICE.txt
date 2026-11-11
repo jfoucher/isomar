@@ -1,0 +1,3 @@
+Adwaita Sans is Copyright The Adwaita Fonts Project Authors (derived from Inter, Copyright The Inter Project Authors).
+It is licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org
+Source: https://github.com/GNOME/adwaita-fonts

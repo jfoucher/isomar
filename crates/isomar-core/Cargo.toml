@@ -1,0 +1,40 @@
+[package]
+name = "isomar-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Isomar's GTK-free domain code: geodesy, chart formats, navigation, comms, weather, routing"
+
+[dependencies]
+anyhow.workspace = true
+bzip2.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+flate2.workspace = true
+grib.workspace = true
+png.workspace = true
+rayon.workspace = true
+roxmltree.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sevenz-rust2.workspace = true
+sha2.workspace = true
+tiff.workspace = true
+ureq.workspace = true
+zip.workspace = true
+
+# macOS, iOS and Android have no libintl: `i18n` reads the .mo files itself there.
+[target.'cfg(not(any(target_os = "macos", target_os = "ios", target_os = "android")))'.dependencies]
+gettext-rs.workspace = true
+
+# A phone or tablet has no serial port an app may open: its instruments come over the network or from the shell.
+[target.'cfg(not(any(target_os = "ios", target_os = "android")))'.dependencies]
+serialport.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[features]
+# Builders of tiles, rasters and GRIB files for other crates' tests.
+testutil = []

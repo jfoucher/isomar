@@ -1,0 +1,10 @@
+/target
+/testdata
+macos/DerivedData
+macos/*.xcodeproj
+macos/Isomar/Generated
+/dist
+/.flatpak
+# Shom tidal atlases converted by scripts/gen-tidal-atlas.py: published by the website, not committed.
+/website/atlases
+/design/stores/

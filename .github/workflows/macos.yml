@@ -1,0 +1,30 @@
+name: macOS
+
+on:
+  push:
+    paths: ["crates/**", "macos/**", "xtask/**", "data/**", "Cargo.*", ".github/workflows/macos.yml"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          brew install cairo pango gettext pkgconf xcodegen
+          rustup target add aarch64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+      - name: Rust tests (the GTK-free crates)
+        run: |
+          export PKG_CONFIG_PATH="$(brew --prefix)/lib/pkgconfig:$(brew --prefix)/share/pkgconfig"
+          export LIBRARY_PATH="$(brew --prefix)/lib:$(brew --prefix gettext)/lib"
+          export CPATH="$(brew --prefix)/include:$(brew --prefix gettext)/include"
+          cargo test -p isomar-core -p isomar-app
+      - name: Library for the app
+        run: macos/scripts/build-rust.sh release
+      - name: App and tests
+        run: |
+          cd macos
+          xcodegen generate
+          xcodebuild -project Isomar.xcodeproj -scheme Isomar -configuration Debug -derivedDataPath DerivedData build test

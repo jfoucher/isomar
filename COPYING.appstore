@@ -1,0 +1,47 @@
+Isomar: additional permission for app stores
+============================================
+
+Copyright (C) 2026 Jonathan Foucher
+
+Isomar is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version (COPYING).
+
+Additional permission under GNU GPL version 3 section 7
+-------------------------------------------------------
+
+As the copyright holder, I give you permission to convey Isomar, or a work based on it, through an
+application store or a similar distribution service (such as Apple's App Store, Google Play or F-Droid)
+whose terms of service or usage rules restrict how recipients may use, copy or share what they receive
+(for example digital rights management, limits on the number of devices, or a ban on further
+distribution), even where those restrictions would otherwise conflict with the GPL, on these
+conditions:
+
+  1. the Corresponding Source of the exact version conveyed through the store is available to
+     everyone, at no charge, under the GPL with this permission, from a place named in the app's
+     About page or store listing; and
+
+  2. every other condition of the GPL is met.
+
+This permission covers only the restrictions the store's terms impose on recipients. It does not
+change the GPL in any other way.
+
+If you modify Isomar, you may extend this permission to your version of it, but you are not obliged
+to do so. If you do not wish to, delete this permission notice from your version.
+
+Contributions
+-------------
+
+Contributions to Isomar are accepted under the GPL with this permission, so that it can go on being
+granted for the whole program.
+
+Third-party code
+----------------
+
+This permission applies only to Isomar's own code. The libraries linked into the phone and tablet
+apps keep their own licences: cairo (LGPL-2.1 or MPL-1.1), pango, glib and fribidi (LGPL-2.1 or
+later), harfbuzz, fontconfig, pixman, libffi and expat (MIT), freetype (FreeType licence), libpng
+(libpng licence), pcre2 (BSD), zlib (zlib licence), and the Rust crates listed in Cargo.lock under
+their own terms. The LGPL libraries are linked statically on iOS and Android; their source, and the
+build scripts that link them (scripts/deps/build-mobile-deps.sh), are published with Isomar's, so that
+a user can rebuild the app against modified versions of them.

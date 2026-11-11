@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/eu/_6px/isomar">
+    <file>style.css</file>
+    <file>sounds/alarm.wav</file>
+    <file>sounds/chime.wav</file>
+    <file>sounds/tick.wav</file>
+    <file compressed="true">icons/scalable/apps/eu._6px.isomar.svg</file>
+    <file compressed="true" alias="icons/scalable/apps/eu._6px.isomar-symbolic.svg">icons/symbolic/apps/eu._6px.isomar-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-ais-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-alarm-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-anchor-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-best-departure-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-charts-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-course-up-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-follow-on-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-follow-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-instruments-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-isochrone-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-layers-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-measure-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-polar-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-route-new-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-route-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-tide-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-track-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-compass-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-depth-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-engine-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-pressure-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-satellite-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-speed-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-tack-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-temperature-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-upwind-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-waves-symbolic.svg</file>
+    <file compressed="true">icons/scalable/actions/isomar-current-symbolic.svg</file>
+  </gresource>
+</gresources>

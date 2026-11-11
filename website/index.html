@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Isomar, sailing chart plotter</title>
+  <meta name="description" content="Isomar is a native chart plotter for Linux, macOS, iPhone, iPad and Android: vector and raster charts, one-click weather, weather routing that helps choose the best window, AIS and instruments.">
+  <meta name="theme-color" content="#f7f7f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1116" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://isomar.marinetechs.com/">
+  <meta property="og:title" content="Isomar, sailing chart plotter">
+  <meta property="og:description" content="Plan your passage. Choose the weather window. Set sail.">
+  <meta property="og:image" content="https://isomar.marinetechs.com/img/linux-chart.webp">
+  <meta property="og:url" content="https://isomar.marinetechs.com/">
+  <meta property="og:type" content="website">
+  <link rel="preload" href="fonts/AdwaitaSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // The palette the visitor picked last time, before the page paints.
+    try { const t = localStorage.getItem("isomar-palette"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.svg" alt="" width="34" height="34">Isomar</a>
+    <nav aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#screenshots">Screenshots</a>
+      <a href="#download">Download</a>
+    </nav>
+    <div class="palette" role="group" aria-label="Palette">
+      <button type="button" data-theme-pick="day" aria-pressed="false">Day</button>
+      <button type="button" data-theme-pick="night" aria-pressed="false">Night</button>
+    </div>
+    <a class="btn btn-primary btn-small" href="#download">Download</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ======================= Hero ======================= -->
+<section class="hero" aria-labelledby="hero-title">
+  <svg class="hero-chart" viewBox="0 0 1600 900" preserveAspectRatio="xMaxYMin slice" aria-hidden="true">
+    <defs>
+      <path id="coast" d="M1640 -40H1060C1075 40 1040 70 1065 110C1090 150 1150 140 1160 190C1170 240 1120 270 1150 320C1180 370 1260 350 1290 400C1320 450 1280 500 1330 540C1380 580 1450 560 1500 600C1540 630 1570 620 1640 650Z"/>
+      <path id="isle" d="M1215 700C1230 682 1270 686 1282 704C1292 720 1270 734 1250 732C1228 730 1205 716 1215 700Z"/>
+      <path id="rock" d="M1132 612C1140 604 1154 608 1152 618C1150 626 1136 626 1132 612Z"/>
+    </defs>
+    <!-- graticule -->
+    <g style="stroke:var(--grid)" stroke-opacity="0.28" stroke-width="1" fill="none">
+      <path d="M200 0V900M600 0V900M1000 0V900M1400 0V900M0 150H1600M0 450H1600M0 750H1600"/>
+    </g>
+    <g style="fill:var(--grid)" fill-opacity="0.75" font-size="12" font-family="Adwaita Sans, sans-serif">
+      <text x="1004" y="16">004°50′W</text>
+      <text x="1404" y="16">004°45′W</text>
+      <text x="1544" y="146">48°25′N</text>
+      <text x="1544" y="446">48°20′N</text>
+    </g>
+    <!-- depth bands, as wide strokes round the land (as the app icon draws them) -->
+    <g fill="none" stroke-linejoin="round">
+      <g style="stroke:var(--shallow-2)" stroke-width="190"><use href="#coast"/><use href="#isle"/><use href="#rock"/></g>
+      <g style="stroke:var(--shallow)" stroke-width="80"><use href="#coast"/><use href="#isle"/><use href="#rock"/></g>
+      <g style="stroke:var(--drying)" stroke-width="18"><use href="#coast"/><use href="#isle"/></g>
+    </g>
+    <!-- contours -->
+    <g fill="none" style="stroke:var(--grid)" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="1 0">
+      <path d="M830 -10C850 120 880 210 860 300C840 400 960 470 1020 520C1090 580 1180 640 1300 700C1400 750 1500 780 1610 800"/>
+      <path d="M700 -10C720 140 760 260 740 360C720 470 860 560 950 620C1060 690 1200 760 1330 820C1420 860 1520 890 1610 900"/>
+    </g>
+    <!-- soundings -->
+    <g style="fill:var(--ink)" fill-opacity="0.45" font-size="13" font-style="italic" font-family="Adwaita Sans, sans-serif">
+      <text x="1240" y="560">9<tspan font-size="9" dy="3">1</tspan></text>
+      <text x="1090" y="300">8<tspan font-size="9" dy="3">2</tspan></text>
+      <text x="1120" y="380">15</text>
+      <text x="1160" y="470">6<tspan font-size="9" dy="3">7</tspan></text>
+      
+      <text x="1240" y="610">11</text>
+      
+      <text x="1410" y="700">14</text>
+    </g>
+    <!-- land -->
+    <g style="fill:var(--land);stroke:var(--coast)" stroke-width="1.6" stroke-linejoin="round">
+      <use href="#coast"/><use href="#isle"/><use href="#rock"/>
+    </g>
+    <!-- a light and its sectors on the cape -->
+    <g fill="none" stroke-width="7" stroke-linecap="butt">
+      <path d="M1160 120A70 70 0 0 0 1095 165" stroke="#c01c28"/>
+      <path d="M1095 165A70 70 0 0 0 1100 228" stroke="#e5b50b"/>
+      <path d="M1100 228A70 70 0 0 0 1160 260" stroke="#26a269"/>
+    </g>
+    <g style="stroke:var(--ink)" stroke-opacity="0.6" stroke-dasharray="4 4" stroke-width="1">
+      <path d="M1160 190L1060 160M1160 190L1070 250"/>
+    </g>
+    <path d="M1160 182l2.4 5.6 6 .4-4.6 3.9 1.5 5.9-5.3-3.2-5.3 3.2 1.5-5.9-4.6-3.9 6-.4z" style="fill:var(--ink)"/>
+    <path d="M1162 194c8 2 14 10 15 20-8 0-15-6-17-14z" fill="#c01c28" fill-opacity="0.9"/>
+    <!-- land and water names, as the chart letters them -->
+    <text x="1350" y="250" style="fill:var(--ink)" fill-opacity="0.75" font-size="16" letter-spacing="3" font-family="Adwaita Sans, sans-serif">PLOUZANÉ</text>
+    <text x="1080" y="96" transform="rotate(-62 1080 96)" style="fill:var(--ink)" fill-opacity="0.7" font-size="14" font-family="Adwaita Sans, sans-serif">Pointe du Cléguer</text>
+    <!-- the route, haloed, with the boat on its second leg -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M760 900L960 660L1080 520L1215 440" style="stroke:var(--sea)" stroke-width="9"/>
+      <path d="M760 900L960 660L1080 520L1215 440" style="stroke:var(--route)" stroke-width="3.5"/>
+    </g>
+    <g style="fill:var(--sea);stroke:var(--route)" stroke-width="3">
+      <circle cx="960" cy="660" r="6"/>
+      <circle cx="1080" cy="520" r="6"/>
+      <circle cx="1215" cy="440" r="6"/>
+    </g>
+    <path transform="translate(1020 590) rotate(41) scale(2)" d="M0 -9C4 -4 4.5 3 3.5 8H-3.5C-4.5 3 -4 -4 0 -9Z" style="fill:var(--boat);stroke:var(--sea)" stroke-width="1.2" stroke-linejoin="round"/>
+    <!-- fade the chart into the page under the text on narrow screens -->
+    <rect width="1600" height="900" fill="url(#heroFade)"/>
+    <linearGradient id="heroFade" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" style="stop-color:var(--sea)" stop-opacity="0.9"/>
+      <stop offset="0.45" style="stop-color:var(--sea)" stop-opacity="0.35"/>
+      <stop offset="0.7" style="stop-color:var(--sea)" stop-opacity="0"/>
+    </linearGradient>
+  </svg>
+
+  <div class="wrap">
+    <div class="hero-text">
+      <p class="eyebrow">Sailing chart plotter and weather route planner</p>
+      <h1 id="hero-title">Plan your passage. <em>Choose the weather window.</em> Set sail.</h1>
+      <p class="lede">Isomar is a native chart plotter for Linux, macOS, iPhone, iPad and Android. Clear planning charts, weather forecasts, routing that tells you when to leave, and AIS and instruments once you're under way.</p>
+      <div class="cta" data-cta>
+        <a class="btn btn-primary" href="downloads/Isomar-0.7.0.flatpak" download data-os="linux">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <span>Download for Linux<small>Flatpak</small></span>
+        </a>
+        <a class="btn btn-secondary" href="downloads/Isomar-0.7.0.dmg" download data-os="mac">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <span>Download for macOS<small>Apple silicon &amp; Intel</small></span>
+        </a>
+        <a class="btn btn-secondary" href="downloads/Isomar-0.7.0.apk" download data-os="android" data-mobile>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <span>Download for Android<small>APK, Android 9 and later</small></span>
+        </a>
+        <a class="btn btn-secondary" href="https://testflight.apple.com/join/w9JaDKRd" data-os="ios" data-mobile>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
+          <span>Get it for iPhone &amp; iPad<small>TestFlight beta</small></span>
+        </a>
+      </div>
+      <p class="also" data-also>Also for <a href="#download-android">Android</a> and <a href="#download-ios">iPhone &amp; iPad</a> (TestFlight beta).</p>
+      <p class="fineprint"><span>Version 0.7.0</span><span>Free and open source (GPL-3.0)</span><span>Planning tool - not for navigation!</span></p>
+    </div>
+
+    <div class="hero-shots">
+      <div class="window">
+        <img src="img/linux-chart.webp" width="1600" height="1000" alt="Isomar on Linux showing the Iroise sea off Brittany: depth shading, lights with their sectors, buoys and soundings.">
+      </div>
+      <div class="window window-mac">
+        <span class="platform-tag" style="left:12px;top:-14px">macOS</span>
+        <img src="img/mac-chart.webp" width="1440" height="900" alt="Isomar on macOS showing Mallorca with its capes named along the coast and the Balearic Islands lettered across the water." loading="lazy">
+      </div>
+      <div class="window window-phone">
+        <span class="platform-tag" style="left:50%;top:-14px;transform:translateX(-50%)">iPhone</span>
+        <img src="img/ios-chart.webp" width="600" height="1304" alt="Isomar on an iPhone: the chart off Quiberon with a route and marks, and the pages as tabs at the bottom." loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Pain points ======================= -->
+<section aria-labelledby="why-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Why Isomar</p>
+      <h2 id="why-title">Passage planning on a laptop is harder than it should be.</h2>
+      <p>Isomar started from the frustrations of planning real passages on a laptop.</p>
+    </div>
+    <div class="problems">
+      <div class="problem">
+        <p class="was"><strong>Obsolete chart plotters</strong>Cramped toolbars, tiny dialogs and frequent crashes.</p>
+        <p class="now"><strong>A native app on every screen.</strong> Linux, Mac, iPhone, iPad and Android, with smooth panning, zooming, and everything one click or tap from the chart.</p>
+      </div>
+      <div class="problem">
+        <p class="was"><strong>Huge GRIB files over slow 4G</strong>A whole ocean of forecast when you just need a single bay.</p>
+        <p class="now"><strong>Only what you need.</strong> Pick the area and check the size before you download. A coastal forecast is a few hundred KB.</p>
+      </div>
+      <div class="problem">
+        <p class="was"><strong>Hard to tell when to leave port</strong>A router gives you a line, then you guess the day.</p>
+        <p class="now"><strong>Best departure date.</strong> Isomar routes every departure in a window and ranks them by hours upwind, wind, waves and darkness.</p>
+      </div>
+      <div class="problem">
+        <p class="was"><strong>Charts locked to one device</strong>Subscriptions, dongles, formats you can't open.</p>
+        <p class="now"><strong>Open formats you own.</strong> Plain S-57 and KAP charts, a free worldwide planning chart, GPX in and out.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Features ======================= -->
+<div class="features" id="features">
+  <div class="wrap">
+
+    <article class="feature">
+      <div class="feature-text">
+        <p class="eyebrow">Charts</p>
+        <h3>Clear charts</h3>
+        <p class="pain">Other plotters often hide names under symbols and show everything at the same size.</p>
+        <p>Isomar tries to get close to the feeling of a paper chart. Sea names spread across the water, marks and lights thin out as you zoom out so the chart stays readable, and shading of the land helps recognise landmarks.</p>
+        <ul>
+          <li><strong>S-57 vector charts</strong> with their updates, drawn in a clear S-52 style, and <strong>BSB/KAP rasters</strong>.</li>
+          <li><strong>A free planning chart anywhere:</strong> OpenStreetMap coast and seamarks, land relief, town names, and sounding depths (in Europe).</li>
+          <li><strong>Click anything</strong> (a buoy, a wreck, a cable, a restricted area) to get information about the feature.</li>
+          <li><strong>Day, dusk and night palettes</strong> that keep your night vision.</li>
+        </ul>
+      </div>
+      <figure class="shot">
+        <img src="img/mac-chart.webp" width="1440" height="900" alt="Mallorca on macOS, with cape names starting at each tip and the Balearic Sea's name spread across the water." loading="lazy">
+        <figcaption>Mallorca on macOS. Each cape's name starts at its tip, and the sea's name is spread across the water.</figcaption>
+      </figure>
+    </article>
+
+    <article class="feature flip">
+      <div class="feature-text">
+        <p class="eyebrow">Weather</p>
+        <h3>Faster forecasts download on slow or expensive connections</h3>
+        <p class="pain">GRIB downloads are big, and it is hard to know which model and fields to pick, or how big the file will be on a phone hotspot.</p>
+        <p>Right-click the chart and choose <em>Get weather here</em>, <em>for this view</em> or <em>for an area</em>. Isomar asks NOAA's GFS for just that box and just the fields you tick, and displays the size before downloading.</p>
+        <ul>
+          <li><strong>Wind, gusts, pressure and waves</strong> as colours, barbs and labelled isobars over the chart.</li>
+          <li><strong>A timeline</strong> to play the forecast forward.</li>
+          <li><strong>Kept for offline use</strong>, warning when the forecast is getting old.</li>
+          <li><strong>Tides</strong> at the nearest station, with the curve for the day.</li>
+        </ul>
+      </div>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="img/linux-get-weather.webp" width="1600" height="1000" alt="The Get weather card on Linux: forecast length, time step and fields, with a download size of 308 KB." loading="lazy">
+          <figcaption>Five days of wind, gusts, pressure and waves for South Brittany is 308 KB.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="feature">
+      <div class="feature-text">
+        <p class="eyebrow">Weather routing</p>
+        <h3>Know when to leave.</h3>
+        <p class="pain">Most weather routers plan one departure time. You still have to compare the days yourself.</p>
+        <p>Isomar routes your passage with the forecast, your boat's polar and the coastline. Then <em>Best time</em> tries every departure in a window and ranks them.</p>
+        <ul>
+          <li><strong>Departures ranked</strong> by their time at sea plus the hours upwind, under engine, in strong wind, gusts or rough sea, and at night, each weighted as you like.</li>
+          <li>Click the front to compare <strong>alternative routes</strong>, and play them all along the timeline.</li>
+          <li><strong>Engine in light wind</strong>, wind limits, your own polar.</li>
+        </ul>
+      </div>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="img/linux-best-departure.webp" width="1600" height="1000" alt="Best departure on Linux for Lorient to A Coruña: a bar chart of the cost of each departure over three days, the best ones listed, and the best route's isochrones over the wind forecast." loading="lazy">
+          <figcaption>Best departure from Lorient to A Coruña. Isomar tried 25 departures and shows the best one with its isochrones.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="feature flip">
+      <div class="feature-text">
+        <p class="eyebrow">Performance</p>
+        <h3>A polar that is more accurate</h3>
+        <p class="pain">A router uses your boat's polar, and a designer's polar is for a new boat with new sails in flat water. Making your own is hard.</p>
+        <p>While you sail, Isomar keeps a log every 10 seconds: the instruments, the engine, and the forecast's wind and waves. It learns what your boat really does in each wind and gives you the option to update the polar.</p>
+        <ul>
+          <li><strong>Learns your polar</strong> from the wind instruments and speedo, where the log holds enough sailing, and keeps the polar you have everywhere else.</li>
+          <li><strong>Finds your instruments' errors</strong>, such as a wind vane turned on its mount, a wind that seems to shift at every tack, or a speedo that reads low.</li>
+          <li><strong>No wind instruments?</strong> With the GPS and the forecast's wind it tells you how fast the boat sails against its polar, for weather routing. A forecast is too imprecise to learn more so you will get an alert.</li>
+          <li><strong>Knows when you motor</strong> from the engine revolutions in Signal K or NMEA, so time under engine never counts as sailing. You can also switch it manually.</li>
+          <li><strong>Each weather route you follow</strong> to the end is compared with its plan.</li>
+        </ul>
+      </div>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="img/linux-polar-learnt.webp" width="1280" height="780" alt="The boat polar editor on Linux: the boat's polar for 10 knots of wind, with dots for what the boat did from the performance log, the learnt polar dashed, and a button to use the learnt speeds." loading="lazy">
+          <figcaption>The polar editor with what the log learnt: dots are what the boat did, the dashed line the polar learnt from them.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/linux-performance.webp" width="1280" height="780" alt="The Performance page on Linux: 200 hours logged, the hours sailing and motoring, and the instrument errors found from 85 tacks and 25 gybes." loading="lazy">
+          <figcaption>The Performance page: the hours logged and what they say about the instruments.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="feature">
+      <div class="feature-text">
+        <p class="eyebrow">Under way</p>
+        <h3>Simple display with only useful instruments</h3>
+        <p class="pain">At night or in traffic you need a few big, clear readouts and important alarms only.</p>
+        <p>Isomar switches to an under-way layout with big, readable instruments with ranked alerts.</p>
+        <ul>
+          <li><strong>NMEA 0183</strong> over TCP, UDP or serial, <strong>gpsd</strong> and <strong>Signal K</strong> with data monitor to check that everything is correct.</li>
+          <li><strong>AIS</strong> with CPA and TCPA collision alerts you can snooze or acknowledge.</li>
+          <li><strong>Anchor watch</strong>, active route with cross-track error and ETA, track recording.</li>
+        </ul>
+      </div>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="img/linux-night.webp" width="1280" height="780" alt="Isomar under way at night on Linux: the instruments page with speed, course, depth and wind, the chart in the night palette." loading="lazy">
+          <figcaption>The night palette under way, with the instruments beside the chart.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/mac-traffic.webp" width="1440" height="900" alt="Under way on macOS: a collision risk alert for the ferry Armorique, with depth, speed, course and wind on the dashboard." loading="lazy">
+          <figcaption>Under way on macOS with a collision alert. The chart shows the ship's closest approach.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="feature flip">
+      <div class="feature-text">
+        <p class="eyebrow">Phone and tablet</p>
+        <h3>The same chart in your pocket.</h3>
+        <p class="pain">Planning happens at the chart table, but the questions come on deck: where is that buoy, when does the wind back, how far to the anchorage?</p>
+        <p>Isomar runs on iPhone, iPad and Android with the same engine, charts and router as the desktop app, laid out for touch.</p>
+        <ul>
+          <li><strong>The pages as tabs</strong> in a sheet over the chart on a phone; a sidebar beside it on a tablet.</li>
+          <li><strong>Weather routing and best departure</strong> on the phone itself, with the forecast downloaded for just your area.</li>
+          <li><strong>Instruments from the boat</strong> over Wi-Fi (NMEA, gpsd, Signal K) or a USB serial adapter on Android, or the phone's own GPS.</li>
+          <li><strong>Anchor watch and route</strong> keep running with the screen off, and the night palette dims the screen.</li>
+        </ul>
+      </div>
+      <div class="phones">
+        <figure class="shot">
+          <img src="img/ios-route.webp" width="600" height="1304" alt="A weather route on an iPhone: the router's alternatives listed in the sheet under the chart and the forecast timeline." loading="lazy">
+          <figcaption>Weather routing on an iPhone.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/android-underway.webp" width="600" height="1333" alt="Under way on an Android phone: depth, speed, course and wind in big type under the chart." loading="lazy">
+          <figcaption>Under way on Android.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/ios-night.webp" width="600" height="1304" alt="The night palette on an iPhone under way, with the instruments under a dark chart." loading="lazy">
+          <figcaption>The night palette.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="feature">
+      <div class="feature-text">
+        <p class="eyebrow">Charts and data</p>
+        <h3>No subscription. No lock-in.</h3>
+        <p class="pain">Chart apps that only open their own encrypted charts, on one device, for as long as you keep paying.</p>
+        <p>Isomar reads the charts you have licensed in open formats, and knows where the free ones are. The <em>Charts</em> page lists the free sources for the area on screen, rated for quality, and installs them in one click.</p>
+        <ul>
+          <li><strong>Free official charts</strong> where they exist, such as NOAA's for all US waters.</li>
+          <li><strong>Your own folders</strong> of S-57 cells and KAP rasters.</li>
+          <li><strong>GPX import and export</strong> compatible with many devices and software.</li>
+          <li><strong>Everything stays on your computer:</strong> no account, no tracking.</li>
+        </ul>
+      </div>
+      <figure class="shot">
+        <img src="img/linux-charts-page.webp" width="1280" height="780" alt="The Charts page on Linux listing free chart sources for the area on screen, each with its quality rating and licence." loading="lazy">
+        <figcaption>The Charts page: what is installed and the free sources for this area.</figcaption>
+      </figure>
+    </article>
+
+  </div>
+</div>
+
+<!-- ======================= Gallery ======================= -->
+<section class="gallery-section" id="screenshots" aria-labelledby="shots-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">what the app looks like</p>
+      <h2 id="shots-title">Screenshots</h2>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Platform">
+      <button type="button" role="tab" id="tab-linux" aria-controls="gallery-linux" aria-selected="true">Linux</button>
+      <button type="button" role="tab" id="tab-mac" aria-controls="gallery-mac" aria-selected="false">macOS</button>
+      <button type="button" role="tab" id="tab-ios" aria-controls="gallery-ios" aria-selected="false">iPhone &amp; iPad</button>
+      <button type="button" role="tab" id="tab-android" aria-controls="gallery-android" aria-selected="false">Android</button>
+    </div>
+
+    <div class="gallery" id="gallery-linux" role="tabpanel" aria-labelledby="tab-linux">
+      <figure><button type="button"><img src="img/linux-chart.webp" width="1600" height="1000" loading="lazy" alt="The Iroise sea off Brittany: lights with their sectors, buoys, depths."></button>
+        <figcaption><strong>The chart</strong>Lights, sectors, marks and depths off Brittany.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-weather.webp" width="1280" height="780" loading="lazy" alt="A wind forecast over the Bay of Biscay with barbs, wind colours and isobars."></button>
+        <figcaption><strong>Weather</strong>Wind barbs and isobars over the Bay of Biscay.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-weather-route.webp" width="1600" height="1000" loading="lazy" alt="A weather route from Lorient to A Coruña across the Bay of Biscay, with the isochrone fronts over the wind forecast."></button>
+        <figcaption><strong>Weather routing</strong>Lorient to A Coruña across the Bay of Biscay, with isochrones.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-best-departure.webp" width="1600" height="1000" loading="lazy" alt="Best departure from Lorient to A Coruña: the cost of each departure over three days."></button>
+        <figcaption><strong>Best departure</strong>Ranking every departure in the configured window</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-polar-learnt.webp" width="1280" height="780" loading="lazy" alt="The polar editor with the speeds learnt from the performance log."></button>
+        <figcaption><strong>Your polar</strong>Learnt from the boat's own log.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-get-weather.webp" width="1600" height="1000" loading="lazy" alt="The Get weather card with the download size shown before downloading."></button>
+        <figcaption><strong>Get weather</strong>The size before you download.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-traffic.webp" width="1280" height="780" loading="lazy" alt="Under way off Brittany: a collision risk alert for the ferry Armorique, with depth, speed, course and wind on the dashboard."></button>
+        <figcaption><strong>Under way</strong>A collision alert, with the dashboard over the chart.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-night.webp" width="1280" height="780" loading="lazy" alt="Instruments under way in the night palette."></button>
+        <figcaption><strong>Night</strong>Instruments under way in the night palette.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-boston.webp" width="1280" height="780" loading="lazy" alt="Boston Harbor with ledges, islands and buoys named."></button>
+        <figcaption><strong>Anywhere</strong>Boston Harbor from the free planning chart.</figcaption></figure>
+      <figure><button type="button"><img src="img/linux-charts-page.webp" width="1280" height="780" loading="lazy" alt="The Charts page with the free sources for Mallorca."></button>
+        <figcaption><strong>Charts</strong>Free sources for the area, rated.</figcaption></figure>
+    </div>
+
+    <div class="gallery" id="gallery-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+      <figure><button type="button"><img src="img/mac-chart.webp" width="1440" height="900" loading="lazy" alt="Mallorca on macOS with capes named along the coast."></button>
+        <figcaption><strong>The chart</strong>Mallorca with names placed as on a paper chart.</figcaption></figure>
+      <figure><button type="button"><img src="img/mac-weather.webp" width="1440" height="900" loading="lazy" alt="A wind forecast over the Bay of Biscay on macOS."></button>
+        <figcaption><strong>Weather</strong>Wind and pressure over the Bay of Biscay.</figcaption></figure>
+      <figure><button type="button"><img class="portrait" src="img/mac-get-weather.webp" width="460" height="636" loading="lazy" alt="The Get weather sheet on macOS showing the area, fields and download size."></button>
+        <figcaption><strong>Get weather</strong>The area, fields and download size in a Mac sheet.</figcaption></figure>
+      <figure><button type="button"><img src="img/mac-passage.webp" width="1440" height="900" loading="lazy" alt="The Passage page on macOS with a route and marks off Brittany."></button>
+        <figcaption><strong>Passage</strong>Routes, marks and tracks off Brittany.</figcaption></figure>
+      <figure><button type="button"><img src="img/mac-traffic.webp" width="1440" height="900" loading="lazy" alt="Under way on macOS with a collision risk alert and the dashboard."></button>
+        <figcaption><strong>Under way</strong>A collision alert and the dashboard.</figcaption></figure>
+    </div>
+
+    <div class="gallery mobile" id="gallery-ios" role="tabpanel" aria-labelledby="tab-ios" hidden>
+      <figure><button type="button"><img src="img/ios-chart.webp" width="600" height="1304" loading="lazy" alt="The chart off Quiberon on an iPhone, with the pages as tabs at the bottom."></button>
+        <figcaption><strong>The chart</strong>Off Quiberon, the pages as tabs.</figcaption></figure>
+      <figure><button type="button"><img src="img/ios-route.webp" width="600" height="1304" loading="lazy" alt="A weather route on an iPhone with the alternatives listed under the chart."></button>
+        <figcaption><strong>Weather routing</strong>Alternatives and the timeline.</figcaption></figure>
+      <figure><button type="button"><img src="img/ios-departures.webp" width="600" height="1304" loading="lazy" alt="Best departure on an iPhone: the cost of each departure over three days."></button>
+        <figcaption><strong>Best departure</strong>Every departure ranked.</figcaption></figure>
+      <figure><button type="button"><img src="img/ios-underway.webp" width="600" height="1304" loading="lazy" alt="Under way on an iPhone: depth, speed, course and wind under the chart."></button>
+        <figcaption><strong>Under way</strong>Big instruments under the chart.</figcaption></figure>
+      <figure><button type="button"><img src="img/ios-night.webp" width="600" height="1304" loading="lazy" alt="The night palette on an iPhone under way."></button>
+        <figcaption><strong>Night</strong>Dark chart, dim screen.</figcaption></figure>
+      <figure class="tablet"><button type="button"><img src="img/ipad-route.webp" width="960" height="1280" loading="lazy" alt="A weather route on an iPad: the route page in the sidebar beside the chart and the wind forecast."></button>
+        <figcaption><strong>iPad</strong>The sidebar beside the chart, with a weather route.</figcaption></figure>
+    </div>
+
+    <div class="gallery mobile" id="gallery-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+      <figure><button type="button"><img src="img/android-chart.webp" width="600" height="1333" loading="lazy" alt="The chart off Quiberon on an Android phone, with the pages as tabs at the bottom."></button>
+        <figcaption><strong>The chart</strong>Off Quiberon, the pages as tabs.</figcaption></figure>
+      <figure><button type="button"><img src="img/android-route.webp" width="600" height="1333" loading="lazy" alt="A weather route on an Android phone with the alternatives under the chart."></button>
+        <figcaption><strong>Weather routing</strong>Alternatives and the timeline.</figcaption></figure>
+      <figure><button type="button"><img src="img/android-departures.webp" width="600" height="1333" loading="lazy" alt="Best departure on an Android phone: the cost of each departure over three days and the best ones listed."></button>
+        <figcaption><strong>Best departure</strong>Every departure ranked.</figcaption></figure>
+      <figure><button type="button"><img src="img/android-underway.webp" width="600" height="1333" loading="lazy" alt="Under way on an Android phone: depth, speed, course and wind under the chart."></button>
+        <figcaption><strong>Under way</strong>Big instruments under the chart.</figcaption></figure>
+      <figure><button type="button"><img src="img/android-night.webp" width="600" height="1333" loading="lazy" alt="The night palette on an Android phone under way."></button>
+        <figcaption><strong>Night</strong>Dark chart, dim screen.</figcaption></figure>
+      <figure class="tablet"><button type="button"><img src="img/android-tablet.webp" width="1600" height="1000" loading="lazy" alt="A weather route on an Android tablet: the route alternatives in the panel beside the chart and the wind forecast."></button>
+        <figcaption><strong>Tablet</strong>The panel beside the chart, with a weather route.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Download ======================= -->
+<section id="download" aria-labelledby="dl-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Download</p>
+      <h2 id="dl-title">Free for Linux, macOS, iPhone, iPad and Android</h2>
+      <p>Version 0.7.0, released 10 November 2026. Isomar is free software under the GPL-3.0 licence.</p>
+    </div>
+    <div class="downloads">
+      <div class="dl" data-platform="linux">
+        <span class="badge">Your system</span>
+        <div class="dl-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <div>
+            <h3>Linux</h3>
+            <p class="meta">Flatpak bundle (6.4 MB)</p>
+          </div>
+        </div>
+        <ul>
+          <li>Any distribution with Flatpak (Fedora, Ubuntu, Debian, Arch…)</li>
+          <li>Uses the GNOME 50 runtime from Flathub</li>
+        </ul>
+        <div class="cmd"><code>flatpak install --user Isomar-0.7.0.flatpak</code><button type="button" data-copy="flatpak install --user Isomar-0.7.0.flatpak">Copy</button></div>
+        <div class="actions">
+          <a class="btn btn-primary" href="downloads/Isomar-0.7.0.flatpak" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Download for Linux
+          </a>
+        </div>
+      </div>
+
+      <div class="dl" data-platform="mac">
+        <span class="badge">Your system</span>
+        <div class="dl-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v9h-15z"/><path d="M2 15h20l-1 3a2 2 0 0 1-2 1.5H5A2 2 0 0 1 3 18z"/></svg>
+          <div>
+            <h3>macOS</h3>
+            <p class="meta">Disk image, Universal (33 MB)</p>
+          </div>
+        </div>
+        <ul>
+          <li>macOS 13 Ventura or later</li>
+          <li>Apple silicon and Intel Macs</li>
+          <li>Signed by Apple: open the disk image and drag Isomar to Applications</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-primary" href="downloads/Isomar-0.7.0.dmg" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Download for macOS
+          </a>
+          <a href="downloads/Isomar-0.7.0.zip">or as a zip</a>
+        </div>
+      </div>
+
+      <div class="dl" data-platform="ios" id="download-ios">
+        <span class="badge">Your system</span>
+        <div class="dl-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
+          <div>
+            <h3>iPhone &amp; iPad</h3>
+            <p class="meta">Public beta on TestFlight</p>
+          </div>
+        </div>
+        <ul>
+          <li>iOS and iPadOS 16 or later</li>
+          <li>Install Apple's TestFlight app, then open the invitation to install Isomar</li>
+          <li>The App Store release follows the beta</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://testflight.apple.com/join/w9JaDKRd">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+            Join the beta on TestFlight
+          </a>
+        </div>
+      </div>
+
+      <div class="dl" data-platform="android" id="download-android">
+        <span class="badge">Your system</span>
+        <div class="dl-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M5 6h14M5 18h14"/></svg>
+          <div>
+            <h3>Android</h3>
+            <p class="meta">APK, phones and tablets (27 MB)</p>
+          </div>
+        </div>
+        <ul>
+          <li>Android 9 or later, phones and tablets</li>
+          <li>Open the downloaded file and allow your browser to install apps when Android asks</li>
+          <li>Updates install over it: download the new version from this page</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-primary" href="downloads/Isomar-0.7.0.apk" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Download for Android
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="not-for-nav" role="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17.5v.01"/></svg>
+      <p><strong>Planning only, not for navigation!</strong>Isomar is early software. The free chart it comes with is built from open data and is not an official chart, and forecasts are models. Use it to plan but navigate with official charts and your own judgement.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="#top"><img src="icon.svg" alt="" width="28" height="28">Isomar</a>
+      <p>A sailing chart plotter by Jonathan Foucher at <a href="https://marinetechs.com">Marinetechs</a>.</p>
+      <p>Free software under the GPL-3.0-or-later licence.</p>
+      <p><a href="privacy.html">Privacy policy</a> · <a href="privacy-choices.html">Your privacy choices</a> · <a href="mailto:jfoucher@6px.eu">jfoucher@6px.eu</a></p>
+    </div>
+    <div>
+      <p><strong>Data</strong></p>
+      <p>Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> (ODbL), served by Open Waters and OpenFreeMap; Natural Earth; NOAA charts and GFS forecasts; EMODnet Bathymetry; SHOM open data; terrain from AWS Terrain Tiles (SRTM and national models); World Magnetic Model by NOAA/NCEI and BGS. Interface font: Adwaita Sans (SIL Open Font License).</p>
+    </div>
+  </div>
+</footer>
+
+<dialog class="lightbox" aria-label="Screenshot">
+  <form method="dialog"><button type="submit" style="all:unset;cursor:zoom-out;display:block"><img src="" alt=""></button></form>
+  <p></p>
+</dialog>
+
+<script src="site.js"></script>
+</body>
+</html>

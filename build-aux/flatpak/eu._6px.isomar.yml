@@ -1,0 +1,61 @@
+# Flatpak manifest for Isomar. Built by scripts/flatpak.sh, which vendors the crates into
+# .flatpak/vendor first so the build runs offline, as flatpak-builder wants.
+id: eu._6px.isomar
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: isomar
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  # Alarm sounds
+  - --socket=pulseaudio
+  # Chart tiles, weather, tides, chart downloads, and TCP/UDP/gpsd/Signal K connections
+  - --share=network
+  # Serial NMEA and AIS receivers
+  - --device=all
+  # Chart folders the user adds, GPX import and export
+  - --filesystem=home
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/isomar/cargo
+    CARGO_NET_OFFLINE: 'true'
+modules:
+  - name: isomar
+    buildsystem: simple
+    build-commands:
+      - mkdir -p cargo && cp cargo-config.toml cargo/config.toml
+      - cargo build --release --offline -p isomar
+      - install -Dm755 target/release/isomar /app/bin/isomar
+      - install -Dm644 data/eu._6px.isomar.desktop /app/share/applications/eu._6px.isomar.desktop
+      - install -Dm644 data/eu._6px.isomar.metainfo.xml /app/share/metainfo/eu._6px.isomar.metainfo.xml
+      - install -Dm644 data/icons/scalable/apps/eu._6px.isomar.svg /app/share/icons/hicolor/scalable/apps/eu._6px.isomar.svg
+      - install -Dm644 data/icons/symbolic/apps/eu._6px.isomar-symbolic.svg /app/share/icons/hicolor/symbolic/apps/eu._6px.isomar-symbolic.svg
+    sources:
+      - type: dir
+        path: ../..
+        skip:
+          - target
+          - testdata
+          - dist
+          - macos
+          - design
+          - .flatpak
+          - .flatpak-builder
+          - .git
+      - type: dir
+        path: ../../.flatpak/vendor
+        dest: vendor
+      - type: inline
+        dest-filename: cargo-config.toml
+        contents: |
+          [source.crates-io]
+          replace-with = "vendored-sources"
+
+          [source.vendored-sources]
+          directory = "/run/build/isomar/vendor"

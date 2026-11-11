@@ -1,0 +1,338 @@
+/* Structure only. Every colour comes from the palette's generated stylesheet
+   (isomar-gtk/build.rs), through libadwaita's variables or a --isomar-<token> one. */
+
+/* Secondary text keeps full opacity with its own colour: opacity would lift Night. */
+.dim-label,
+.dimmed {
+  opacity: 1;
+  color: var(--isomar-text-muted);
+}
+
+:focus-visible {
+  outline-color: var(--isomar-focus-ring);
+}
+
+.numeric {
+  font-feature-settings: "tnum";
+}
+
+/* Readouts. */
+.readout-xl {
+  font-size: 56px;
+  line-height: 60px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  font-feature-settings: "tnum";
+}
+
+.readout-l {
+  font-size: 40px;
+  line-height: 44px;
+  font-weight: 600;
+  font-feature-settings: "tnum";
+}
+
+.readout-m {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 600;
+  font-feature-settings: "tnum";
+}
+
+.readout-unit {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--isomar-text-muted);
+}
+
+.caption-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* A line of values with icons where a row has its subtitle (ui/chips.rs). */
+.chips-subtitle {
+  font-size: smaller;
+  color: var(--isomar-text-muted);
+}
+
+/* A chart source's rating, A to C, before its name. */
+.rating-badge {
+  border: 1px solid currentColor;
+  border-radius: var(--isomar-radius-full);
+  min-width: 18px;
+  padding: 0 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stale {
+  color: var(--isomar-stale);
+}
+
+.stale-badge {
+  color: var(--isomar-stale);
+  border: 1px solid var(--isomar-stale);
+  border-radius: var(--isomar-radius-full);
+  padding: 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Alerts: one alarm strip over the chart, warnings below it, info toasts. */
+.alert-strip {
+  padding: 6px 12px;
+  min-height: 34px;
+}
+
+/* How many alarms there are, after the alarm's words: an alarm icon and the number. */
+.alarm-count {
+  border: 1px solid currentColor;
+  border-radius: var(--isomar-radius-full);
+  padding: 1px 8px;
+}
+
+.alert-strip.alarm {
+  background-color: var(--isomar-alarm-bg);
+  color: var(--isomar-on-alarm);
+  border-bottom: 2px solid var(--isomar-alarm);
+}
+
+.alert-strip.alarm.dim {
+  background-color: var(--isomar-card-bg);
+  color: var(--isomar-alarm);
+}
+
+.alert-strip.warning {
+  background-color: var(--isomar-warning-bg);
+  color: var(--isomar-on-warning);
+  border-bottom: 1px solid var(--isomar-warning);
+}
+
+.alert-strip button {
+  color: inherit;
+  background-color: alpha(currentColor, 0.15);
+}
+
+.alert-strip button:hover {
+  background-color: alpha(currentColor, 0.25);
+}
+
+.alert-strip button.strong {
+  background-color: alpha(currentColor, 0.28);
+  font-weight: 700;
+}
+
+banner.warning > revealer > widget {
+  background-color: var(--isomar-warning-bg);
+  color: var(--isomar-on-warning);
+}
+
+toast {
+  background-color: var(--isomar-info-bg);
+  color: var(--isomar-on-info);
+}
+
+/* Cards over the chart: opaque, never blurred. */
+.isomar-card {
+  padding: 10px 12px;
+  background-color: var(--isomar-card-bg);
+  color: var(--isomar-text);
+  border-radius: var(--isomar-radius-m);
+  box-shadow: var(--isomar-shadow-card);
+  border: 1px solid var(--isomar-border);
+}
+
+/* Dialogs floating inside the window (`ui/float.rs`). */
+.floating-panel {
+  background-color: var(--window-bg-color);
+  color: var(--window-fg-color);
+  border-radius: var(--isomar-radius-l);
+  box-shadow: var(--isomar-shadow-popover);
+  outline: 1px solid var(--isomar-border);
+  outline-offset: -1px;
+}
+
+.map-cluster {
+  background-color: var(--isomar-card-bg);
+  border-radius: var(--isomar-radius-l);
+  box-shadow: var(--isomar-shadow-card);
+  border: 1px solid var(--isomar-border);
+  padding: 4px;
+}
+
+.map-cluster button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+
+.underway .map-cluster button {
+  min-width: 56px;
+  min-height: 56px;
+}
+
+.underway .navigating-card button,
+.underway headerbar button {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* The footer strip under the chart. */
+.isomar-footer {
+  background-color: var(--isomar-card-bg);
+  border-top: 1px solid var(--isomar-border);
+  padding: 2px 12px;
+  font-size: 0.8rem;
+  font-feature-settings: "tnum";
+}
+
+.isomar-footer button.flat {
+  padding: 0 4px;
+  min-height: 20px;
+}
+
+.planning-pill {
+  color: var(--isomar-warning);
+  border: 1px solid var(--isomar-warning);
+  border-radius: var(--isomar-radius-full);
+  padding: 0 8px;
+  min-height: 18px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-dot {
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 4px;
+  background-color: var(--isomar-text-disabled);
+}
+
+.status-dot.ok {
+  background-color: var(--isomar-ok);
+}
+
+.status-dot.stale {
+  background-color: var(--isomar-stale);
+}
+
+.status-dot.alarm {
+  background-color: var(--isomar-alarm);
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 6px 12px 0 12px;
+}
+
+.instrument-tile {
+  padding: 8px 12px;
+  min-height: 72px;
+}
+
+.dashboard {
+  padding: 8px;
+}
+
+/* Under way, the instruments' column where the sidebar was: sizes are set by the code to fill it. */
+.underway-column {
+  padding: 12px;
+  background-color: var(--sidebar-bg-color);
+}
+
+.underway-column .instrument-tile {
+  padding: 0;
+  min-height: 0;
+}
+
+.underway-column .navigating-card {
+  min-width: 0;
+}
+
+.instrument-figure {
+  font-weight: 600;
+  font-feature-settings: "tnum";
+  letter-spacing: -0.5px;
+}
+
+.instrument-label {
+  font-weight: 700;
+}
+
+.hint-card {
+  padding: 6px 8px 6px 12px;
+}
+
+.navigating-card {
+  padding: 14px;
+  min-width: 330px;
+}
+
+.waypoint-number {
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 14px;
+  background-color: var(--isomar-route);
+  color: var(--isomar-on-route);
+  font-weight: 700;
+}
+
+.timeline {
+  padding: 4px 8px;
+}
+
+.title-button {
+  padding: 2px 10px;
+}
+
+.title-button .title {
+  font-weight: 700;
+}
+
+.title-button .subtitle {
+  font-size: 0.8rem;
+  color: var(--isomar-text-muted);
+}
+
+image.ais {
+  color: var(--isomar-ais);
+}
+
+image.warning {
+  color: var(--isomar-warning);
+}
+
+list.boxed-list > label {
+  padding: 12px;
+}
+
+.stale-badge.fresh {
+  color: var(--isomar-ok);
+  border-color: var(--isomar-ok);
+}
+
+/* Field chips of Get weather. */
+button.chip {
+  border-radius: var(--isomar-radius-full);
+  padding: 0 10px;
+  min-height: 24px;
+  font-size: 0.85rem;
+}
+
+button.chip:checked {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+}
+
+.weather-card,
+.router-card {
+  padding: 12px 14px;
+}
+
+/* A button whose job is running (ui/busy.rs): it looks off, as a disabled button does, but still
+   takes a press, which shows the running jobs. */
+.job-busy {
+  filter: opacity(var(--disabled-opacity, 0.5));
+}

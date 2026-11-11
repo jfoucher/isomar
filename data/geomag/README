@@ -1,0 +1,5 @@
+WMM2025.COF is the coefficient file of the World Magnetic Model 2025 (valid 2025.0 to 2030.0), produced by NOAA's
+National Centers for Environmental Information and the British Geological Survey for the US National
+Geospatial-Intelligence Agency and the UK Defence Geographic Centre. NOAA puts the model and its software in the
+public domain (https://www.ncei.noaa.gov/products/world-magnetic-model). Replace it with the next model's file in
+2030; `isomar_core::geomag` reads the epoch and coefficients from the header.

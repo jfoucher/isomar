@@ -1,0 +1,27 @@
+[package]
+name = "isomar-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Isomar's toolkit-free application engine: layers, canvas engine, state, view-models"
+
+[dependencies]
+isomar-core = { path = "../isomar-core" }
+async-channel.workspace = true
+cairo = { version = "0.22", package = "cairo-rs" }
+chrono.workspace = true
+dirs.workspace = true
+pango = "0.22"
+pangocairo = "0.22"
+rayon.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+zip.workspace = true
+
+[dev-dependencies]
+isomar-core = { path = "../isomar-core", features = ["testutil"] }
+tempfile.workspace = true
+
+[build-dependencies]
+serde_json.workspace = true

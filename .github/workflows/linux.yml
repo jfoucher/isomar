@@ -1,0 +1,24 @@
+name: Linux
+
+on:
+  push:
+    # The Swift and Kotlin sources too: a test checks the calls they make exist.
+    paths: ["crates/**", "xtask/**", "data/**", "macos/**/*.swift", "android/**/*.kt", "Cargo.*", ".github/workflows/linux.yml"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # GTK 4.18 and libadwaita 1.7 or later, and the compiler the app is written with.
+    container: fedora:44
+    steps:
+      - name: Tools
+        run: dnf install -y git gcc rust cargo clippy gtk4-devel libadwaita-devel gettext p7zip-plugins adwaita-sans-fonts
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Tests
+        run: cargo test
+      - name: The app
+        run: cargo build -p isomar

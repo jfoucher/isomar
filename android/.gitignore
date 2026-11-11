@@ -1,0 +1,9 @@
+.gradle/
+build/
+local.properties
+.kotlin/
+# Built by scripts/android-build.sh: the Rust library and the fonts copied from macos/Isomar/Resources.
+app/src/main/jniLibs/
+app/src/main/assets/fonts/
+app/src/main/java/io/github/isomar/ui/Tokens.kt
+app/src/main/assets/sounds/

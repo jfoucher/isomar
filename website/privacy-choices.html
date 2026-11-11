@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your privacy choices · Isomar</title>
+  <meta name="description" content="How to control what Isomar uses, downloads and keeps: location, instruments, online data, the data on your device and what the app stores share.">
+  <meta name="theme-color" content="#f7f7f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1116" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://isomar.marinetechs.com/privacy-choices.html">
+  <link rel="preload" href="fonts/AdwaitaSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // The palette the visitor picked last time, before the page paints.
+    try { const t = localStorage.getItem("isomar-palette"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="icon.svg" alt="" width="34" height="34">Isomar</a>
+    <nav aria-label="Sections">
+      <a href="./#features">Features</a>
+      <a href="./#screenshots">Screenshots</a>
+      <a href="./#download">Download</a>
+    </nav>
+    <div class="palette" role="group" aria-label="Palette">
+      <button type="button" data-theme-pick="day" aria-pressed="false">Day</button>
+      <button type="button" data-theme-pick="night" aria-pressed="false">Night</button>
+    </div>
+    <a class="btn btn-primary btn-small" href="./#download">Download</a>
+  </div>
+</header>
+
+<main class="legal">
+  <div class="wrap">
+    <p class="legal-date">Last updated 10 November 2026, for Isomar 0.7.0</p>
+    <h1>Your privacy choices</h1>
+    <p class="lede">Isomar collects nothing about you, so there is nothing to opt out of with us. This page shows how to control what the app may use, what it downloads, and what it keeps on your device.</p>
+
+    <nav class="legal-toc" aria-label="On this page">
+      <a href="#location">Location</a>
+      <a href="#network">Local network and notifications</a>
+      <a href="#online">What the app downloads</a>
+      <a href="#data">What the app keeps</a>
+      <a href="#delete">Deleting everything</a>
+      <a href="#stores">What the stores share</a>
+      <a href="#website">The website</a>
+      <a href="#ask">Asking us</a>
+    </nav>
+
+    <h2 id="location">Location</h2>
+    <p>Isomar works without it: the position then comes from your instruments, or the chart is simply shown without the boat.</p>
+    <dl class="services">
+      <div>
+        <dt>iPhone and iPad</dt>
+        <dd>Settings › Isomar › Location: Never, Ask Next Time or While Using the App. Precise Location can be turned off there too, at the cost of a boat drawn only roughly.</dd>
+      </div>
+      <div>
+        <dt>Android</dt>
+        <dd>Settings › Apps › Isomar › Permissions › Location: Allow only while using the app, Ask every time, or Don't allow.</dd>
+      </div>
+      <div>
+        <dt>Linux and macOS</dt>
+        <dd>Nothing to set: Isomar does not use the system's location services there.</dd>
+      </div>
+    </dl>
+    <p>Isomar uses the position with the screen off only while it keeps watch: an anchor alarm set, a route followed or a track recorded. Clear the anchor alarm, stop the route or stop recording and it stops; iOS's location indicator and Android's "Isomar is keeping watch" notification go with it.</p>
+
+    <h2 id="network">Local network and notifications</h2>
+    <ul>
+      <li><strong>Local network</strong> (iPhone and iPad): Settings › Isomar › Local Network. Turned off, Isomar cannot reach instruments on the boat's Wi-Fi. Removing a connection in the app stops it reading from that address.</li>
+      <li><strong>Notifications</strong>: Settings › Notifications › Isomar (iPhone, iPad, Android). Take care: with notifications off, an alarm cannot reach you while the app is not on screen.</li>
+    </ul>
+
+    <h2 id="online">What the app downloads</h2>
+    <p>Every download is listed in the <a href="privacy.html#online">privacy policy</a>. You decide which happen:</p>
+    <ul>
+      <li><strong>Chart layers</strong>: switch any of these off in the list of layers and nothing more is fetched for it.
+        <ul>
+          <li>"Download coastline" and "Download seamarks" (Open Waters)</li>
+          <li>"Place names and town outlines" (OpenFreeMap)</li>
+          <li>"Relief: hillshade and contours" (terrain tiles on Amazon Web Services)</li>
+          <li>"Download depths" (EMODnet), off until you turn it on</li>
+        </ul>
+      </li>
+      <li><strong>Forecasts</strong> are downloaded only when you ask for one, or start a weather route, a best-departure scan or an ensemble check. Choosing ECMWF IFS, AIFS or ICON-EU as the model sends no area at all.</li>
+      <li><strong>Tides</strong> are fetched only when you ask for the tides at a place.</li>
+      <li><strong>Currents</strong>: turn off "Sail in the current" on the Weather page and no currents are fetched from Copernicus.</li>
+      <li><strong>Tidal atlases and charts</strong> are downloaded only when you install them.</li>
+      <li><strong>Offline</strong>: everything already downloaded is kept, so Isomar keeps working with no connection, or with the device in aeroplane mode.</li>
+    </ul>
+
+    <h2 id="data">What the app keeps</h2>
+    <dl class="services">
+      <div>
+        <dt>Performance log</dt>
+        <dd>Performance page: switch off recording to stop logging the instruments under way, or "Clear…" to delete every sample logged.</dd>
+      </div>
+      <div>
+        <dt>Routes, waypoints and tracks</dt>
+        <dd>Delete each from its list in the app. A track is only recorded when you start recording.</dd>
+      </div>
+      <div>
+        <dt>Forecasts</dt>
+        <dd>Weather page › "Clear the forecast".</dd>
+      </div>
+      <div>
+        <dt>Charts, polars and tidal atlases</dt>
+        <dd>Remove each from the page where you added it.</dd>
+      </div>
+      <div>
+        <dt>Instrument connections</dt>
+        <dd>Remove them from the connections list.</dd>
+      </div>
+      <div>
+        <dt>Device backups</dt>
+        <dd>To keep Isomar's files out of iCloud: Settings › your name › iCloud › Manage Storage › Backups. On Android, the backup settings of your Google account.</dd>
+      </div>
+    </dl>
+
+    <h2 id="delete">Deleting everything</h2>
+    <p>On iPhone, iPad and Android, uninstalling Isomar deletes everything it kept. On Linux and macOS, your routes and settings survive an uninstall so that a reinstall finds them; to remove them, delete these folders:</p>
+    <dl class="services">
+      <div>
+        <dt>Linux</dt>
+        <dd><code>~/.config/isomar</code>, <code>~/.local/share/isomar</code> and <code>~/.cache/isomar</code></dd>
+      </div>
+      <div>
+        <dt>Linux, Flatpak</dt>
+        <dd><code>flatpak uninstall --delete-data eu._6px.isomar</code>, or delete <code>~/.var/app/eu._6px.isomar</code></dd>
+      </div>
+      <div>
+        <dt>macOS</dt>
+        <dd><code>~/Library/Application Support/isomar</code> and <code>~/Library/Caches/isomar</code></dd>
+      </div>
+    </dl>
+
+    <h2 id="stores">What the stores share</h2>
+    <p>Isomar itself reports nothing. The stores pass crash reports and statistics to developers only if you agreed to it:</p>
+    <ul>
+      <li><strong>iPhone and iPad</strong>: Settings › Privacy &amp; Security › Analytics &amp; Improvements › Share With App Developers. On TestFlight, feedback reaches us only when you send it.</li>
+      <li><strong>Android</strong> (Google Play): Settings › Google › Usage &amp; diagnostics. The package downloaded from this website shares nothing.</li>
+    </ul>
+
+    <h2 id="website">The website</h2>
+    <ul>
+      <li>The Day or Night choice is the only thing the site keeps in your browser. Clear this site's data in your browser to forget it.</li>
+      <li>The server's logs of each request are needed to serve the pages and keep them safe, and are deleted within 90 days. To have yours deleted sooner, write to us with your IP address and the time of your visit.</li>
+    </ul>
+
+    <h2 id="ask">Asking us</h2>
+    <p>For a question, or to see or delete personal data we hold (only website logs and the emails you send), write to <a href="mailto:jfoucher@6px.eu">jfoucher@6px.eu</a>. We answer within one month. You can also complain to a data protection authority; in France, the <a href="https://www.cnil.fr/">CNIL</a>.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="./"><img src="icon.svg" alt="" width="28" height="28">Isomar</a>
+      <p>A sailing chart plotter by Jonathan Foucher at <a href="https://marinetechs.com">Marinetechs</a>.</p>
+      <p>Free software under the GPL-3.0-or-later licence.</p>
+    </div>
+    <div>
+      <p><strong>Privacy</strong></p>
+      <p><a href="privacy.html">Privacy policy</a> · <a href="privacy-choices.html" aria-current="page">Your privacy choices</a> · <a href="mailto:jfoucher@6px.eu">jfoucher@6px.eu</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

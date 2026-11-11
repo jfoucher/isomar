@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- NMEA over UDP from the boat's Wi-Fi: broadcast packets arrive only while a multicast lock is held. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- The phone's GPS, when no instruments give the position. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <!-- NMEA instruments and AIS receivers on a USB serial adapter. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+    <!-- Alarms with the screen off: a notification over the lock screen, and the watch service that keeps
+         the engine and the GPS running while an anchor watch, a route or a track is on. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name=".IsomarApp"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Material.NoActionBar"
+        android:supportsRtl="true">
+        <!-- A fold, a rotation or a window resize keeps the Activity: the engine lives in the Application. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density|uiMode|keyboardHidden"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" android:resource="@xml/usb_serial" />
+        </activity>
+        <service
+            android:name=".WatchService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+        <receiver android:name=".AlarmActions" android:exported="false" />
+    </application>
+</manifest>

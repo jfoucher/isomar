@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>eu._6px.isomar</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Isomar</name>
+  <summary>Chart plotter for sailors</summary>
+  <developer id="eu.6px">
+    <name>Jonathan Foucher</name>
+  </developer>
+  <description>
+    <p>
+      Isomar is a chart plotter for sailors: nautical charts (S-57 vector and BSB raster), routes and
+      waypoints, instruments from NMEA, AIS and Signal K, tides, weather forecasts and weather routing.
+    </p>
+    <p>
+      It ships an open-data planning chart that is not for navigation, and reads the charts you have
+      licensed yourself.
+    </p>
+  </description>
+  <launchable type="desktop-id">eu._6px.isomar.desktop</launchable>
+  <icon type="stock">eu._6px.isomar</icon>
+  <categories>
+    <category>Utility</category>
+    <category>Maps</category>
+  </categories>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.7.0" date="2026-11-10"/>
+    <release version="0.6.0" date="2026-11-09"/>
+    <release version="0.5.0" date="2026-11-04"/>
+    <release version="0.4.0" date="2026-11-02"/>
+  </releases>
+</component>

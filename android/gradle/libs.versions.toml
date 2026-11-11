@@ -1,0 +1,30 @@
+[versions]
+agp = "9.4.1"
+kotlin = "2.4.21"
+composeBom = "2026.09.00"
+activityCompose = "1.13.0"
+coreKtx = "1.19.1"
+serialization = "1.11.0"
+iconsExtended = "1.7.8"
+window = "1.5.1"
+lifecycle = "2.11.0"
+usbSerial = "3.8.1"
+
+[libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "iconsExtended" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+androidx-window = { module = "androidx.window:window", version.ref = "window" }
+androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
+
+usb-serial = { module = "com.github.mik3y:usb-serial-for-android", version.ref = "usbSerial" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

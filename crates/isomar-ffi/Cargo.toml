@@ -1,0 +1,20 @@
+[package]
+name = "isomar-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "A C interface to isomar-app for the macOS shell"
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+isomar-app = { path = "../isomar-app" }
+async-channel.workspace = true
+chrono.workspace = true
+cairo = { version = "0.22", package = "cairo-rs" }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy policy · Isomar</title>
+  <meta name="description" content="Isomar has no account, no analytics and no advertising. What you do in the app stays on your device; this page says exactly what leaves it and where it goes.">
+  <meta name="theme-color" content="#f7f7f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1116" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://isomar.marinetechs.com/privacy.html">
+  <link rel="preload" href="fonts/AdwaitaSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // The palette the visitor picked last time, before the page paints.
+    try { const t = localStorage.getItem("isomar-palette"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="icon.svg" alt="" width="34" height="34">Isomar</a>
+    <nav aria-label="Sections">
+      <a href="./#features">Features</a>
+      <a href="./#screenshots">Screenshots</a>
+      <a href="./#download">Download</a>
+    </nav>
+    <div class="palette" role="group" aria-label="Palette">
+      <button type="button" data-theme-pick="day" aria-pressed="false">Day</button>
+      <button type="button" data-theme-pick="night" aria-pressed="false">Night</button>
+    </div>
+    <a class="btn btn-primary btn-small" href="./#download">Download</a>
+  </div>
+</header>
+
+<main class="legal">
+  <div class="wrap">
+    <p class="legal-date">Last updated 10 November 2026, for Isomar 0.7.0</p>
+    <h1>Privacy policy</h1>
+    <p class="lede">Isomar has no account, no analytics, no advertising and no tracking. What you do in the app stays on your device. This page says exactly what leaves it, and where it goes.</p>
+
+    <div class="legal-summary">
+      <h2>In short</h2>
+      <ul>
+        <li><strong>We collect nothing from the app.</strong> There is no account, no analytics, no crash reporting and no advertising identifier.</li>
+        <li><strong>Your routes, tracks, position and settings are stored only on your device.</strong> None of it is sent to us or to anyone else.</li>
+        <li><strong>Charts and forecasts come straight from the public services that publish them.</strong> Those downloads carry the area you are looking at and, like any connection, your IP address, but nothing that identifies you or your device.</li>
+        <li><strong>The website sets no cookies and runs no analytics.</strong></li>
+      </ul>
+      <p>How to change any of this: <a href="privacy-choices.html">Your privacy choices</a>.</p>
+    </div>
+
+    <nav class="legal-toc" aria-label="On this page">
+      <a href="#who">Who is responsible</a>
+      <a href="#device">What stays on your device</a>
+      <a href="#position">Your position</a>
+      <a href="#instruments">Instruments and the local network</a>
+      <a href="#online">Online services the app uses</a>
+      <a href="#website">The website</a>
+      <a href="#stores">App stores and beta testing</a>
+      <a href="#rights">Your rights</a>
+      <a href="#changes">Changes to this policy</a>
+    </nav>
+
+    <h2 id="who">Who is responsible</h2>
+    <p>Isomar is made by Jonathan Foucher at <a href="https://marinetechs.com">Marinetechs</a>, who is responsible for this policy and for the website. For any question about it or about your data, write to <a href="mailto:jfoucher@6px.eu">jfoucher@6px.eu</a>.</p>
+    <p>Isomar is free software under the GPL-3.0-or-later licence: anyone can read its source and check that it does what this page says.</p>
+
+    <h2 id="device">What stays on your device</h2>
+    <p>Isomar keeps these on your phone, tablet or computer, and nowhere else:</p>
+    <ul>
+      <li><strong>Settings</strong>: units, the layers shown, your boat's size, alarm limits and the connections to your instruments.</li>
+      <li><strong>Routes, waypoints and tracks</strong>, and the plan of each weather route (the forecast cut to its path). A track is recorded only after you start recording.</li>
+      <li><strong>The performance log.</strong> While the boat is under way, Isomar averages the instruments over 10 seconds (time, position, speed, heading, wind, heel, engine revolutions) to learn how your boat sails against its polar. It is on by default; you can turn it off or clear it on the Performance page.</li>
+      <li><strong>Charts, polars and tidal atlases</strong> you install or import.</li>
+      <li><strong>Copies of what was downloaded</strong> (chart tiles, forecasts, currents, tides) so that the app works without a connection, and a short technical log (<code>isomar.log</code>, at most 1 MB) for troubleshooting.</li>
+    </ul>
+    <p>Exporting a GPX file or the performance log writes a file only where you choose. The technical log leaves your device only if you send it to us yourself.</p>
+    <p>Your device's own backup (iCloud, Google's Android backup, Time Machine and the like) may include these files. That copy is under your account and that service's terms; we cannot see it.</p>
+
+    <h2 id="position">Your position</h2>
+    <p>On iPhone, iPad and Android, Isomar asks for permission to use the device's location, to show where you are on the chart when no instrument gives the position. If you allow it:</p>
+    <ul>
+      <li>The position is used on the device: to draw the boat, sound alarms, record a track you started and fill the performance log. It is never sent to us.</li>
+      <li>Isomar never sends your position on its own. A forecast you ask for covers an area, and a tide prediction a point you pick, and either may include where you are (see <a href="#online">Online services</a>).</li>
+      <li>While Isomar keeps watch (an anchor alarm is set, a route is followed or a track is recorded), it keeps receiving the position with the screen off so that alarms still sound. iOS then shows its location indicator, and Android a notification saying "Isomar is keeping watch". Otherwise it uses the location only while the app is open.</li>
+    </ul>
+    <p>On Linux and macOS, Isomar does not use the system's location services: the position comes only from instruments you connect.</p>
+
+    <h2 id="instruments">Instruments and the local network</h2>
+    <p>When you add a connection to the boat's instruments (NMEA 0183 over Wi-Fi, TCP or UDP, gpsd, Signal K, a serial port, or a USB adapter on Android), Isomar reads it on your local network or cable, at the address you entered. iOS asks for permission to use the local network for this.</p>
+    <p>What the instruments send (position, wind, depth, engine data, and AIS reports of vessels nearby) is used on the device. AIS targets are shown and watched for collision risk; they are not saved.</p>
+    <p>Alarms are shown by your device's own notifications. Isomar uses no push service.</p>
+
+    <h2 id="online">Online services the app uses</h2>
+    <p>To draw charts and fetch weather, Isomar downloads public data directly from the organisations that publish it. There is no Isomar server in between, except for the tidal atlases. Each request:</p>
+    <ul>
+      <li>carries your IP address, as any connection on the internet does;</li>
+      <li>names the area or point needed: tile numbers, a forecast box or a tide position;</li>
+      <li>names the app only as <code>isomar/0.1 (open-source chart plotter)</code>, the same for everyone, with no account, device identifier, cookie or advertising ID.</li>
+    </ul>
+    <p>The operators of these services may keep logs of the requests they receive, under their own privacy policies.</p>
+
+    <dl class="services">
+      <div>
+        <dt>Open Waters <span>tiles.openwaters.io</span></dt>
+        <dd>Coastline, seamarks and anchorages of the planning chart, while those layers are shown. Sends the area on screen.</dd>
+      </div>
+      <div>
+        <dt>Open Waters tides <span>api.openwaters.io</span></dt>
+        <dd>Tide predictions, when you ask for the tides at a place, and for a Shom atlas's reference port. Sends that point, to about 10 metres.</dd>
+      </div>
+      <div>
+        <dt>OpenFreeMap <span>tiles.openfreemap.org</span></dt>
+        <dd>Place names and town outlines, while that layer is shown. Sends the area on screen.</dd>
+      </div>
+      <div>
+        <dt>Terrain Tiles on Amazon Web Services <span>s3.amazonaws.com</span></dt>
+        <dd>Land relief (hillshade and contours), while that layer is shown. Sends the area on screen.</dd>
+      </div>
+      <div>
+        <dt>EMODnet Bathymetry <span>ows.emodnet-bathymetry.eu</span></dt>
+        <dd>Depths, only if you turn that layer on (it is off at first). Sends the area on screen.</dd>
+      </div>
+      <div>
+        <dt>NOAA NOMADS <span>nomads.ncep.noaa.gov</span></dt>
+        <dd>GFS forecasts, and the GEFS members for an ensemble check, when you ask for them. Sends the area of the forecast.</dd>
+      </div>
+      <div>
+        <dt>ECMWF open data <span>data.ecmwf.int</span></dt>
+        <dd>IFS and AIFS forecasts, when you ask for them. Sends nothing about the area: the app reads the same global files as everyone and crops them on the device.</dd>
+      </div>
+      <div>
+        <dt>Deutscher Wetterdienst open data <span>opendata.dwd.de</span></dt>
+        <dd>ICON-EU forecasts, when you ask for them. The same whole files for everyone, cropped on the device.</dd>
+      </div>
+      <div>
+        <dt>Copernicus Marine Service <span>stac.marine.copernicus.eu, s3.waw3-1.cloudferro.com</span></dt>
+        <dd>Ocean currents, when a weather route or a best departure is computed with "Sail in the current" on. Sends the area of the passage.</dd>
+      </div>
+      <div>
+        <dt>Isomar's website <span>isomar.marinetechs.com</span></dt>
+        <dd>Shom tidal atlases, only when you install a zone. Sends which zone; the request is logged as described under <a href="#website">The website</a>.</dd>
+      </div>
+      <div>
+        <dt>Chart producers <span>NOAA, Shom, LINZ and others</span></dt>
+        <dd>Only when you choose to install a chart from the catalogue. Downloads that chart's file from its producer.</dd>
+      </div>
+    </dl>
+
+    <p>Forecasts, tides and currents are downloaded only when you ask for them, or when you start a weather route or a best-departure scan that needs them. Turning a layer off stops its downloads.</p>
+
+    <h2 id="website">The website</h2>
+    <ul>
+      <li>isomar.marinetechs.com sets <strong>no cookies</strong> and runs <strong>no analytics, advertising or third-party scripts</strong>. Its fonts and images come from our own server.</li>
+      <li>If you pick Day or Night at the top of the page, the choice is kept in your browser's local storage (<code>isomar-palette</code>). It is never sent to us.</li>
+      <li>The site runs on our own server at Hetzner, in Germany, behind Cloudflare, which carries the traffic and shields the site from attacks. Cloudflare processes your IP address and the request to do so, under <a href="https://www.cloudflare.com/privacypolicy/">its privacy policy</a>.</li>
+      <li>Our server logs each request: the time, your IP address, the page or file asked for, your browser's user agent and the page you came from. The same goes for the tidal atlases the app downloads. We use these logs only to keep the site running and secure, share them with no one, and delete them within 90 days. The legal basis is our legitimate interest in running a secure website (GDPR, article 6(1)(f)).</li>
+    </ul>
+
+    <h2 id="stores">App stores and beta testing</h2>
+    <p>If you install Isomar from the App Store, TestFlight or Google Play, Apple or Google handle the download under their own policies. If you have agreed in your device's settings to share diagnostics with app developers, the store passes us crash reports and statistics (such as the number of installs) that do not identify you. On TestFlight, Apple also passes us crash reports and the feedback and screenshots you choose to send. We use these only to fix the app.</p>
+    <p>The Flatpak, the disk image and the Android package downloaded from this website report nothing to anyone.</p>
+
+    <h2 id="children">Children</h2>
+    <p>Isomar is not aimed at children, and collects no personal data from anyone.</p>
+
+    <h2 id="rights">Your rights</h2>
+    <p>Under the GDPR you can ask us to show, correct or delete personal data we hold about you, or object to its use, by writing to <a href="mailto:jfoucher@6px.eu">jfoucher@6px.eu</a>; we answer within one month. The only personal data we can hold are the website logs above and the emails you send us. To find your requests in the logs we need the IP address and the approximate time.</p>
+    <p>You can also complain to a data protection authority; in France, the <a href="https://www.cnil.fr/">CNIL</a>.</p>
+    <p>The data Isomar keeps on your device is yours to keep or delete: <a href="privacy-choices.html">Your privacy choices</a> says how.</p>
+
+    <h2 id="changes">Changes to this policy</h2>
+    <p>If Isomar starts to use a new online service or to handle data differently, this page will say so before the version that does it is released, with a new date at the top.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="./"><img src="icon.svg" alt="" width="28" height="28">Isomar</a>
+      <p>A sailing chart plotter by Jonathan Foucher at <a href="https://marinetechs.com">Marinetechs</a>.</p>
+      <p>Free software under the GPL-3.0-or-later licence.</p>
+    </div>
+    <div>
+      <p><strong>Privacy</strong></p>
+      <p><a href="privacy.html" aria-current="page">Privacy policy</a> · <a href="privacy-choices.html">Your privacy choices</a> · <a href="mailto:jfoucher@6px.eu">jfoucher@6px.eu</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

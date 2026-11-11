@@ -1,0 +1,7 @@
+- Automatic route: still to do are ENC hazards (DEPARE/OBSTRN/WRECKS) and seamarks (cardinal, isolated danger, lateral gates); see plan phases 2 to 4.
+- Weather route: look into "No way forward after 184 hours. It may be calm, too windy, blocked by land, or the forecast may end before the passage does. Try motoring, or load a longer forecast."
+- Remove the OpenSeaMap attribution when viewing an ENC chart.
+- Add "not for navigation" when not viewing an ENC chart.
+- BSB display variables: MAX_OVERZOOM_DETAILED_OVER_BASE, INK_WEIGHT.
+- Suggest a sheltered spot for tonight from what Isomar already has: the coves bundle with cove_axis, EMODnet depth, seabed type and the forecast wind. It must never suggest a spot inside a no_anchoring area.
+- Show potential sheltering spots along a weather route.

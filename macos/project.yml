@@ -1,0 +1,242 @@
+name: Isomar
+
+options:
+  bundleIdPrefix: eu.6px
+  developmentLanguage: en
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+  # Isomar/Generated/Tokens.swift has to exist for the project to include it.
+  preGenCommand: "[ -f scripts/gen-tokens.sh ] && scripts/gen-tokens.sh || macos/scripts/gen-tokens.sh"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.7.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # This Mac's architecture; macos/scripts/package.sh asks for both.
+    ARCHS: "$(NATIVE_ARCH_ACTUAL)"
+    ONLY_ACTIVE_ARCH: "YES"
+    # Local builds are signed ad hoc; release signing and notarisation are done by macos/scripts/notarize.sh.
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: "24G23598DF"    # Jonathan Foucher, as for the workout app
+    # The build phases below run cargo and write into the build folder.
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+
+targets:
+  Isomar:
+    type: application
+    platform: macOS
+    sources:
+      - path: Isomar
+    # Run in Xcode builds everything: the Rust library and Tokens.swift first, the libraries copied into the
+    # app after linking (see macos/scripts/xcode-phase.sh).
+    preBuildScripts:
+      - name: Build the Rust library
+        script: '"$SRCROOT/scripts/xcode-phase.sh" rust'
+        basedOnDependencyAnalysis: false
+    postBuildScripts:
+      - name: Bundle cairo and pango
+        script: '"$SRCROOT/scripts/xcode-phase.sh" bundle'
+        basedOnDependencyAnalysis: false
+    settings:
+      configs:
+        # Xcode signs a Debug build ad hoc, and the hardened runtime's library validation would refuse the
+        # bundled libraries signed the same way. Release keeps it: package.sh and notarize.sh sign for real.
+        Debug:
+          ENABLE_HARDENED_RUNTIME: "NO"
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: eu.6px.isomar
+        PRODUCT_NAME: Isomar
+        INFOPLIST_FILE: Isomar/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: Isomar/Isomar-Bridging-Header.h
+        HEADER_SEARCH_PATHS: "$(SRCROOT)/../crates/isomar-ffi/include"
+        ENABLE_HARDENED_RUNTIME: "YES"
+        CODE_SIGN_ENTITLEMENTS: Isomar/Isomar.entitlements
+        ENABLE_DEBUG_DYLIB: "NO"
+        COMBINE_HIDPI_IMAGES: "YES"
+        # Isomar/Assets.xcassets, rendered from Icon/AppIcon.svg by scripts/make-icon.sh.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # The Rust library comes from macos/scripts/build-rust.sh; cairo and pango from Homebrew,
+        # which macos/scripts/bundle-dylibs.sh copies into the app and points the binary at.
+        # The universal library and the universal cairo and pango when they are built (macos/deps), else this
+        # architecture's from macos/deps, else Homebrew's.
+        LIBRARY_SEARCH_PATHS:
+          - "$(SRCROOT)/../target/universal/release"
+          - "$(HOME)/dev/isomar-deps/universal/lib"
+          - "$(HOME)/dev/isomar-deps/prefix-$(NATIVE_ARCH_ACTUAL)/lib"
+          - /opt/homebrew/lib
+          - /usr/local/lib
+        OTHER_LDFLAGS:
+          - -lisomar_ffi
+          - -lpangocairo-1.0
+          - -lpango-1.0
+          - -lcairo
+          - -lharfbuzz
+          - -lgobject-2.0
+          - -lglib-2.0
+          - -lcairo-gobject
+          - -lgio-2.0
+          - -liconv
+          - -framework
+          - IOKit
+          - -framework
+          - CoreFoundation
+          - -framework
+          - Foundation
+
+
+  # The iPhone and iPad app (phase 0 spike: the chart full screen). The Rust library and its static cairo and
+  # pango are built first by scripts/ios-sim.sh (scripts/deps/build-mobile-deps.sh ios|ios-sim|ios-sim-x86_64).
+  IsomarTouch:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: IsomarTouch
+      # The Mac app's model, pages and sheets; its window, chart view and theme are the Mac's own.
+      - path: Isomar
+        excludes:
+          - ChartView.swift
+          - IsomarApp.swift
+          - Theme.swift
+          - Info.plist
+          - Isomar.entitlements
+          - Assets.xcassets
+          - "Resources/Fonts/**"
+      - path: Isomar/Resources/Fonts
+        type: folder
+        buildPhase: resources
+    # Merged with the generated keys below. Location in the background keeps an anchor watch, a route or a
+    # track going with the screen off (DeviceLocation.setWatching turns it on only then).
+    info:
+      path: IsomarTouch/Info.plist
+      properties:
+        UIBackgroundModes: [location]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: eu.6px.isomar
+        PRODUCT_NAME: Isomar
+        # IsomarTouch/Assets.xcassets, rendered from Icon/AppIconTouch.svg by scripts/make-icon.sh.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: Isomar
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Isomar shows where you are on the chart, from the phone's GPS when no instruments give the position."
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "Isomar reads the boat's instruments (NMEA over Wi-Fi, gpsd, Signal K) on the local network."
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        # Only HTTPS through the system's and rustls's standard encryption: exempt, so TestFlight and App
+        # Store uploads skip the export-compliance question.
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: "NO"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        # Signed by Xcode with the team's development certificate and profile, as the workout app is, so it
+        # runs on a device from Xcode; the Mac app's ad hoc identity above cannot install on one.
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "Apple Development"
+        ARCHS: arm64
+        # The simulator runs the Mac's own architecture: x86_64 on an Intel Mac.
+        "ARCHS[sdk=iphonesimulator*]": "$(NATIVE_ARCH_ACTUAL)"
+        SWIFT_OBJC_BRIDGING_HEADER: Isomar/Isomar-Bridging-Header.h
+        HEADER_SEARCH_PATHS: "$(SRCROOT)/../crates/isomar-ffi/include"
+        ENABLE_DEBUG_DYLIB: "NO"
+        # The Rust library, and the static cairo, pango and the rest it was built against (the -l list is
+        # `pkgconf --static --libs pangocairo gio-2.0 cairo-gobject` there, plus libc++ for harfbuzz).
+        "LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=arm64]":
+          - "$(SRCROOT)/../target/aarch64-apple-ios-sim/release"
+          - "$(HOME)/dev/isomar-deps/prefix-ios-sim/lib"
+        "LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=x86_64]":
+          - "$(SRCROOT)/../target/x86_64-apple-ios/release"
+          - "$(HOME)/dev/isomar-deps/prefix-ios-sim-x86_64/lib"
+        "LIBRARY_SEARCH_PATHS[sdk=iphoneos*]":
+          - "$(SRCROOT)/../target/aarch64-apple-ios/release"
+          - "$(HOME)/dev/isomar-deps/prefix-ios/lib"
+        OTHER_LDFLAGS:
+          - -lisomar_ffi
+          - -lpangocairo-1.0
+          - -lpangoft2-1.0
+          - -lpango-1.0
+          - -lfribidi
+          - -lharfbuzz
+          - -lgio-2.0
+          - -lgmodule-2.0
+          - -lcairo-gobject
+          - -lgobject-2.0
+          - -lffi
+          - -lglib-2.0
+          - -lpcre2-8
+          - -lcairo
+          - -lfontconfig
+          - -lexpat
+          - -lintl
+          - -lfreetype
+          - -lbz2
+          - -lpng16
+          - -lz
+          - -lpixman-1
+          - -lc++
+          - -liconv
+          - -lresolv
+          - -framework
+          - CoreFoundation
+          - -framework
+          - Foundation
+
+  IsomarTests:
+    type: bundle.unit-test
+    platform: macOS
+    dependencies:
+      - target: Isomar        # builds libisomar_ffi.a first
+        link: false
+    sources:
+      - path: IsomarTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: eu.6px.isomar.tests
+        GENERATE_INFOPLIST_FILE: "YES"
+        # The universal libraries are named @rpath/<name>; the test bundle loads them from where they were built.
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(HOME)/dev/isomar-deps/universal/lib"
+        SWIFT_OBJC_BRIDGING_HEADER: Isomar/Isomar-Bridging-Header.h
+        HEADER_SEARCH_PATHS: "$(SRCROOT)/../crates/isomar-ffi/include"
+        # The universal library and the universal cairo and pango when they are built (macos/deps), else this
+        # architecture's from macos/deps, else Homebrew's.
+        LIBRARY_SEARCH_PATHS:
+          - "$(SRCROOT)/../target/universal/release"
+          - "$(HOME)/dev/isomar-deps/universal/lib"
+          - "$(HOME)/dev/isomar-deps/prefix-$(NATIVE_ARCH_ACTUAL)/lib"
+          - /opt/homebrew/lib
+          - /usr/local/lib
+        OTHER_LDFLAGS:
+          - -lisomar_ffi
+          - -lpangocairo-1.0
+          - -lpango-1.0
+          - -lcairo
+          - -lharfbuzz
+          - -lgobject-2.0
+          - -lglib-2.0
+          - -lcairo-gobject
+          - -lgio-2.0
+          - -liconv
+          - -framework
+          - IOKit
+          - -framework
+          - CoreFoundation
+          - -framework
+          - Foundation
+    sources:
+      - path: IsomarTests
+      - path: Isomar/Generated/Tokens.swift
+        optional: true
+
+schemes:
+  Isomar:
+    build:
+      targets:
+        Isomar: all
+        IsomarTests: [test]
+    test:
+      targets: [IsomarTests]
