@@ -27,9 +27,22 @@ def run(*cmd):
     return subprocess.run(cmd, check=True, capture_output=True, text=True).stdout
 
 def deps(path):
-    # A universal file lists each architecture under a header line of its own; the references start with a tab.
-    lines = [l for l in run("otool", "-L", path).splitlines() if l.startswith("\t")]
+    # Every slice: on an Intel Mac a plain `otool -L` lists only the x86_64 one, and 0.7.0 shipped arm64
+    # slices that named the build folder. Each slice is listed under a header line; references start with a tab.
+    lines = [l for l in run("otool", "-arch", "all", "-L", path).splitlines() if l.startswith("\t")]
     return list(dict.fromkeys(l.split(" (compatibility")[0].strip() for l in lines))
+
+def check(fw, exe):
+    """Every slice of every file must find its libraries in the system or in Frameworks."""
+    bad = []
+    for f in [exe] + [os.path.join(fw, n) for n in sorted(os.listdir(fw))]:
+        for d in deps(f):
+            if d.startswith(SYSTEM):
+                continue
+            if not (d.startswith("@rpath/") and os.path.exists(os.path.join(fw, d[7:]))):
+                bad.append(f"{os.path.basename(f)}: {d}")
+    if bad:
+        sys.exit("libraries found outside the app:\n  " + "\n  ".join(bad))
 
 def main(app):
     exe = os.path.join(app, "Contents", "MacOS", "Isomar")
@@ -62,7 +75,10 @@ def main(app):
             elif d.startswith("@executable_path/"):
                 continue
             else:
-                real = os.path.realpath(d)
+                # A slice naming one architecture's build folder: the universal library of that name, when
+                # there is one, so that the thin file does not replace it in Frameworks.
+                uni = os.path.join(LIB_DIRS[0], os.path.basename(d))
+                real = os.path.realpath(uni if os.path.exists(uni) else d)
             if not os.path.exists(real):
                 sys.exit(f"cannot find {d} needed by {f}")
             name = os.path.basename(real)
@@ -80,6 +96,7 @@ def main(app):
     if "@executable_path/../Frameworks" not in rpaths:
         run("install_name_tool", "-add_rpath", "@executable_path/../Frameworks", exe)
     shutil.rmtree(prev, ignore_errors=True)
+    check(fw, exe)
     for dest in copied.values():
         sign(dest)
     sign(app, app=True)

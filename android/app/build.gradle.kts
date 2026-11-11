@@ -21,8 +21,8 @@ android {
         minSdk = 28
         targetSdk = 36
         // MAJOR*10000 + MINOR*100 + PATCH of versionName; it must grow with every APK published.
-        versionCode = 700
-        versionName = "0.7.0"
+        versionCode = 701
+        versionName = "0.7.1"
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
