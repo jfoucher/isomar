@@ -79,5 +79,6 @@ echo "→ $OUT/Isomar-$VERSION.zip"
 echo "→ $DMG"
 echo "→ architectures: $(lipo -archs "$APP/Contents/MacOS/Isomar")"
 for f in "$APP"/Contents/Frameworks/*.dylib; do [ "$(lipo -archs "$f")" = "x86_64 arm64" ] || [ "$(lipo -archs "$f")" = "arm64 x86_64" ] || echo "   not universal: $(basename "$f") $(lipo -archs "$f")"; done
-echo "→ every library in the bundle (otool -L shows @rpath and system paths only):"
-for f in "$APP/Contents/MacOS/Isomar" "$APP"/Contents/Frameworks/*.dylib; do otool -L "$f" | tail -n +2 | awk '{print $1}'; done | sort -u | grep -v '^@rpath\|^/usr/lib\|^/System' || echo "   none outside the system"
+# Every slice: on an Intel Mac a plain `otool -L` shows only x86_64, and said "none" of 0.7.0's arm64 slices.
+echo "→ every library in the bundle, every architecture (otool shows @rpath and system paths only):"
+for f in "$APP/Contents/MacOS/Isomar" "$APP"/Contents/Frameworks/*.dylib; do otool -arch all -L "$f" | grep $'^\t' | awk '{print $1}'; done | sort -u | grep -v '^@rpath\|^/usr/lib\|^/System' || echo "   none outside the system"
