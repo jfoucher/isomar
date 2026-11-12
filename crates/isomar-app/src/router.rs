@@ -681,6 +681,22 @@ mod tests {
         }
 
         #[test]
+        fn a_weather_route_is_not_routed_again() {
+            use serde_json::json;
+            let (app, id) = with_plan(true);
+            let plain = app.session.borrow_mut().save_route(&Route::new("plain")).unwrap().id;
+            let get = |id: i64| crate::api::call(&app, "route_get", &json!({ "id": id }));
+            assert_eq!((get(id)["weather_route"].clone(), get(plain)["weather_route"].clone()), (json!(true), json!(false)));
+            let rows = crate::api::call(&app, "passage", &serde_json::Value::Null)["routes"].clone();
+            let weather = |id: i64| rows.as_array().unwrap().iter().find(|r| r["id"] == id).unwrap()["weather"].clone();
+            assert_eq!((weather(id), weather(plain)), (json!(true), json!(false)));
+            for (name, arg) in [("route_compute", "departure"), ("window_run", "earliest")] {
+                let r = crate::api::call(&app, name, &json!({ "id": id, arg: "2026-11-20 08:00" }));
+                assert!(r["error"].as_str().is_some_and(|e| e.contains("weather routing")), "{name}: {r}");
+            }
+        }
+
+        #[test]
         fn a_route_without_a_plan_cannot_be_replayed() {
             let app = app();
             let r = app.session.borrow_mut().save_route(&Route::new("plain")).unwrap();

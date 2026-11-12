@@ -52,6 +52,12 @@ impl ModelWeather {
     }
 }
 
+/// Whether route `id` was made by weather routing (it keeps a plan). Such a route is not routed
+/// again: neither a weather route nor a best departure is offered on it.
+pub fn is_weather_route(app: &AppState, id: i64) -> bool {
+    app.session.borrow().plans.contains_key(&id)
+}
+
 /// The "Currents" switch of the routing panels: whether routes sail in the current, and what covers a
 /// passage between `points` (or will, once fetched).
 #[derive(serde::Serialize, Clone, Debug, PartialEq)]

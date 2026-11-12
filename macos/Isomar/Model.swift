@@ -9,7 +9,7 @@ struct LayerItem: Identifiable, Equatable {
     var visible: Bool
 }
 
-struct RouteRow: Decodable, Identifiable, Equatable { let id: Int64; let name: String; let detail: [Chip]; let planned: [Chip]; let visible: Bool; let active: Bool }
+struct RouteRow: Decodable, Identifiable, Equatable { let id: Int64; let name: String; let detail: [Chip]; let planned: [Chip]; let weather: Bool; let visible: Bool; let active: Bool }
 struct WaypointRow: Decodable, Identifiable, Equatable { let id: Int64; let name: String; let detail: String }
 struct TrackRow: Decodable, Identifiable, Equatable { let id: Int64; let name: String; let detail: [Chip]; let visible: Bool }
 struct FollowingRow: Decodable, Equatable { let name: String; let detail: [Chip] }

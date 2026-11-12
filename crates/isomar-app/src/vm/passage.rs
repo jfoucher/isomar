@@ -31,6 +31,8 @@ pub struct RouteRow {
     /// A weather route's plan: when it leaves and when it arrives (or the forecast ends); empty
     /// for a route with no plan.
     pub planned: Vec<Chip>,
+    /// Made by weather routing: it is not routed again.
+    pub weather: bool,
     pub visible: bool,
     pub active: bool,
 }
@@ -112,6 +114,7 @@ pub fn passage(app: &AppState) -> Passage {
                 name: r.name.clone(),
                 detail: points_and_distance(r.points.len(), total_distance_nm(r)),
                 planned: s.plans.get(&r.id).map(plan_times).unwrap_or_default(),
+                weather: s.plans.contains_key(&r.id),
                 visible: r.visible,
                 active: Some(r.id) == active_id,
             })

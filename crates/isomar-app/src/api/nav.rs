@@ -61,6 +61,8 @@ fn route_json(app: &AppState, id: i64) -> Value {
     json!({
         "id": r.id, "name": r.name, "speed_kn": r.speed_kn,
         "plan": vm::plan::info(app, id),
+        // Made by weather routing: it is not offered weather routing or a best departure again.
+        "weather_route": s.plans.contains_key(&id),
         "ensemble": flows::ensemble::lines(app, id),
         "departure": r.departure.map(|d| d.with_timezone(&Local).format("%Y-%m-%d %H:%M").to_string()).unwrap_or_default(),
         "visible": r.visible,

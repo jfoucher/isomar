@@ -140,6 +140,8 @@ private fun RouteDetail(id: Long) {
     var summary by remember(id) { mutableStateOf(emptyList<Chip>()) }
     var legs by remember(id) { mutableStateOf(emptyList<JsonObject>()) }
     var plan by remember(id) { mutableStateOf<JsonObject?>(null) }
+    // Made by weather routing: not offered weather routing or a best departure again.
+    var weatherRoute by remember(id) { mutableStateOf(false) }
     var ensemble by remember(id) { mutableStateOf(emptyList<String>()) }
     var stamp by remember { mutableStateOf(0) }
     LaunchedEffect(id, stamp) {
@@ -150,6 +152,7 @@ private fun RouteDetail(id: Long) {
         summary = chipsOf(d["chips"])
         legs = (d["legs"] as? JsonArray)?.map { it.jsonObject } ?: emptyList()
         plan = d["plan"] as? JsonObject
+        weatherRoute = d.bool("weather_route") ?: false
         ensemble = (d["ensemble"] as? JsonArray)?.mapNotNull { it.jsonPrimitive.contentOrNull } ?: emptyList()
     }
     PageColumn {
@@ -167,14 +170,16 @@ private fun RouteDetail(id: Long) {
         }
         SectionHeader("Plan a passage")
         BoxedList {
-            ListRow("Weather routing", subtitle = "The fastest way with the forecast and the boat's polar", icon = Icons.Outlined.WbCloudy, onClick = { Model.showRouting(id, false) }) {
-                Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, null, tint = c(Tok.textMuted), modifier = Modifier.padding(end = 8.dp))
+            if (!weatherRoute) {
+                ListRow("Weather routing", subtitle = "The fastest way with the forecast and the boat's polar", icon = Icons.Outlined.WbCloudy, onClick = { Model.showRouting(id, false) }) {
+                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, null, tint = c(Tok.textMuted), modifier = Modifier.padding(end = 8.dp))
+                }
+                ListDivider()
+                ListRow("Best departure", subtitle = "When to leave, over the days the forecast covers", icon = Icons.Outlined.Navigation, onClick = { Model.showRouting(id, true) }) {
+                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, null, tint = c(Tok.textMuted), modifier = Modifier.padding(end = 8.dp))
+                }
+                ListDivider()
             }
-            ListDivider()
-            ListRow("Best departure", subtitle = "When to leave, over the days the forecast covers", icon = Icons.Outlined.Navigation, onClick = { Model.showRouting(id, true) }) {
-                Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, null, tint = c(Tok.textMuted), modifier = Modifier.padding(end = 8.dp))
-            }
-            ListDivider()
             ListRow("Auto route", subtitle = "Adds waypoints to keep the route in safe water", icon = Icons.Outlined.AltRoute, busy = Model.busy("autoroute:$id"), onClick = { Model.job("autoroute:$id") { Model.sheet = TaskSheet.AutoRoute(id) } })
             ListDivider()
             ListRow("Ensemble check", subtitle = "Sails the route through 31 GEFS forecasts for the spread of its arrival and wind; a few minutes' download", icon = Icons.Outlined.WbCloudy, busy = Model.busy("ensemble:$id"), onClick = { Model.job("ensemble:$id") { Model.send("route_ensemble", Model.args("id" to id)) } })

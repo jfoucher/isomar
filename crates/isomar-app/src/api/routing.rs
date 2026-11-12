@@ -39,6 +39,7 @@ pub(super) fn call(app: &Rc<AppState>, name: &str, args: &Value) -> Option<Value
                 "currents": flows::routing::currents_choice(app, &r.points.iter().map(|p| p.pos).collect::<Vec<_>>()),
             })
         }
+        "route_compute" if flows::routing::is_weather_route(app, i(args, "id")) => error(gettext("This route was made by weather routing: route the route it came from instead.")),
         "route_compute" => match parse_departure(&s(args, "departure")) {
             Ok(Some(depart)) => {
                 if let Some(on) = args.get("currents").and_then(|v| v.as_bool()) {

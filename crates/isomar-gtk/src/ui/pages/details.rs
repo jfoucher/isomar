@@ -63,10 +63,13 @@ pub fn route(app: &Rc<AppState>, id: i64) -> Option<adw::NavigationPage> {
     content.append(&actions);
 
     let plan = adw::PreferencesGroup::builder().title(gettext("Plan a passage")).build();
-    for (icon, title, subtitle, action) in [
+    // A route made by weather routing is not routed again.
+    let weather_route = r.get("weather_route").and_then(|v| v.as_bool()).unwrap_or(false);
+    let rows = [
         ("isomar-isochrone-symbolic", gettext("Weather routing"), gettext("The fastest way with the forecast and the boat's polar, and when to leave"), "win.weather-routing"),
         ("isomar-route-symbolic", gettext("Auto route…"), gettext("Adds waypoints to keep the route in safe water"), "win.auto-route"),
-    ] {
+    ];
+    for (icon, title, subtitle, action) in rows.into_iter().filter(|row| !(weather_route && row.3 == "win.weather-routing")) {
         let row = adw::ActionRow::builder().title(title).subtitle(subtitle).activatable(true).build();
         row.add_prefix(&gtk::Image::from_icon_name(icon));
         if action == "win.auto-route" {

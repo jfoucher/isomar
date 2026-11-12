@@ -169,8 +169,11 @@ fn route_items(app: &Rc<AppState>, b: &mut Builder, id: i64) {
     b.item(&gettext("Edit route"), move |a| actions::edit_route(a, id));
     b.item(&gettext("Reverse route"), move |a| actions::reverse_route(a, id));
     b.item(&gettext("Route properties…"), move |a| open(a, Dialog::RouteProperties(id)));
-    b.item(&gettext("Weather route…"), move |a| open(a, Dialog::WeatherRoute(id)));
-    b.item(&gettext("Best departure…"), move |a| open(a, Dialog::BestDeparture(id)));
+    // A route made by weather routing is not routed again.
+    if !crate::flows::routing::is_weather_route(app, id) {
+        b.item(&gettext("Weather route…"), move |a| open(a, Dialog::WeatherRoute(id)));
+        b.item(&gettext("Best departure…"), move |a| open(a, Dialog::BestDeparture(id)));
+    }
     b.item(&gettext("Auto route…"), move |a| open(a, Dialog::AutoRoute(id)));
     b.item(&gettext("Delete route"), move |a| confirm_delete(a, name.clone(), move |a| actions::delete_route(a, id)));
 }

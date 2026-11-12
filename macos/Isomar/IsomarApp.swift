@@ -104,7 +104,9 @@ struct ChartCommands: Commands {
             Button("Set Anchor Watch") { model.command("anchor_here") }
             Button("Clear Anchor Watch") { model.command("stop_watching") }
             Divider()
-            Button("Weather Routing…") { if let r = model.currentRoute { model.showRouting(r) } }.disabled(model.currentRoute == nil)
+            // A route made by weather routing is not routed again.
+            Button("Weather Routing…") { if let r = model.currentRoute { model.showRouting(r) } }
+                .disabled(model.currentRoute.map { r in model.passage.routes.contains { $0.id == r && $0.weather } } ?? true)
             Button("Auto Route…") { if let r = model.currentRoute { model.job("autoroute:\(r)") { model.sheet = .autoRoute(r) } } }.disabled(model.currentRoute == nil)
             Divider()
             Button("Measure") { model.toggleMeasure() }

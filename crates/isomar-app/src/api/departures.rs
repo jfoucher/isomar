@@ -37,6 +37,7 @@ pub(super) fn call(app: &Rc<AppState>, name: &str, args: &Value) -> Option<Value
                 "currents": flows::routing::currents_choice(app, &r.points.iter().map(|p| p.pos).collect::<Vec<_>>()),
             })
         }
+        "window_run" if flows::routing::is_weather_route(app, i(args, "id")) => error(gettext("This route was made by weather routing: route the route it came from instead.")),
         "window_run" => match (parse_departure(&s(args, "earliest")), serde_json::from_value::<Weights>(args.get("weights").cloned().unwrap_or(Value::Null))) {
             (Ok(Some(earliest)), Ok(weights)) => {
                 if let Some(on) = args.get("currents").and_then(|v| v.as_bool()) {

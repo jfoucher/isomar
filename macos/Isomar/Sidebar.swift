@@ -357,6 +357,8 @@ struct RouteDetail: View {
     @State private var loaded = false
     /// What the route was planned with (`route_get`'s "plan"), when it was made by weather routing.
     @State private var plan: [String: Any]?
+    /// Made by weather routing (`route_get`'s "weather_route"): not offered weather routing again.
+    @State private var weatherRoute = false
     /// What the ensemble check said (`route_get`'s "ensemble").
     @State private var ensemble: [String] = []
 
@@ -380,8 +382,11 @@ struct RouteDetail: View {
                     }
                     Text("Plan a passage").font(.system(size: 13)).padding(.leading, 4)
                     BoxedList {
-                        NavRow(symbol: "cloud.sun", title: "Weather routing", subtitle: "The fastest way with the forecast and the boat's polar, and when to leave") { model.showRouting(id) }
-                        Divider()
+                        // A route made by weather routing is not routed again.
+                        if !weatherRoute {
+                            NavRow(symbol: "cloud.sun", title: "Weather routing", subtitle: "The fastest way with the forecast and the boat's polar, and when to leave") { model.showRouting(id) }
+                            Divider()
+                        }
                         NavRow(symbol: "arrow.triangle.turn.up.right.diamond", title: "Auto route…", subtitle: "Adds waypoints to keep the route in safe water", busy: model.busy("autoroute:\(id)")) { model.job("autoroute:\(id)") { model.sheet = .autoRoute(id) } }
                         Divider()
                         NavRow(symbol: "cloud.sun.rain", title: "Ensemble check", subtitle: "Sails the route through 31 GEFS forecasts for the spread of its arrival and wind; a few minutes' download", busy: model.busy("ensemble:\(id)")) { model.job("ensemble:\(id)") { model.send("route_ensemble", ["id": id]) } }
@@ -453,6 +458,7 @@ struct RouteDetail: View {
         points = d["points"] as? [[String: Any]] ?? []
         summary = chips(from: d["chips"])
         plan = d["plan"] as? [String: Any]
+        weatherRoute = d["weather_route"] as? Bool ?? false
         ensemble = d["ensemble"] as? [String] ?? []
     }
 
