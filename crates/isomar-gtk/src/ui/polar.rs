@@ -55,6 +55,21 @@ impl Layout {
     }
 }
 
+fn polar_filter() -> gtk::gio::ListStore {
+    let f = gtk::FileFilter::new();
+    f.set_name(Some(&gettext("Polar files (*.pol, *.csv, *.txt)")));
+    f.add_pattern("*.pol");
+    f.add_pattern("*.csv");
+    f.add_pattern("*.txt");
+    let all = gtk::FileFilter::new();
+    all.set_name(Some(&gettext("All files")));
+    all.add_pattern("*");
+    let store = gtk::gio::ListStore::new::<gtk::FileFilter>();
+    store.append(&f);
+    store.append(&all);
+    store
+}
+
 /// Outer ring and spacing of the rings for a polar, with room above its
 /// fastest point.
 fn scale_for(p: &Polar) -> (f64, f64) {
@@ -554,6 +569,7 @@ pub fn open(app: &Rc<AppState>) {
         set_from.append_item(&item);
     }
     let first_section = gtk::gio::Menu::new();
+    first_section.append(Some(&gettext("Import Polar File…")), Some("polar.import"));
     first_section.append(Some(&gettext("Save as a New Polar…")), Some("polar.save-as"));
     first_section.append_submenu(Some(&gettext("Set the Speeds From")), &set_from);
     menu.append_section(None, &first_section);
@@ -573,6 +589,75 @@ pub fn open(app: &Rc<AppState>) {
             }
         })
     };
+    {
+        let action = gtk::gio::SimpleAction::new("import", None);
+        let (app, state, redraw) = (app.clone(), state.clone(), redraw.clone());
+        action.connect_activate(move |_, _| {
+            let (app, state, redraw) = (app.clone(), state.clone(), redraw.clone());
+            gtk::glib::spawn_future_local(async move {
+                if state.borrow().dirty {
+                    let cur_name = selected_row(&state.borrow()).map(|r| r.entry.name.clone()).unwrap_or_default();
+                    if !super::confirm(
+                        &gettext_f("Discard the changes to {name}?", &[("name", &cur_name)]),
+                        &gettext("The speeds you changed are not saved."),
+                        &gettext("Discard"),
+                        true,
+                    )
+                    .await
+                    {
+                        return;
+                    }
+                }
+                let window = crate::ui::chart_widget().root().and_then(|r| r.downcast::<gtk::Window>().ok());
+                let dialog = gtk::FileDialog::builder()
+                    .title(gettext("Import Polar"))
+                    .filters(&polar_filter())
+                    .modal(false)
+                    .build();
+                let Ok(file) = dialog.open_future(window.as_ref()).await else { return };
+                let Some(path) = file.path() else { return };
+                let path_clone = path.clone();
+                let text = match crate::ui::bg(move || std::fs::read_to_string(path_clone)).await {
+                    Ok(t) => t,
+                    Err(e) => {
+                        show_error(&gettext("Could not read the file"), &e.to_string());
+                        return;
+                    }
+                };
+                let parsed = match Polar::parse(&text) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        show_error(&gettext("Could not read the polar"), &e.to_string());
+                        return;
+                    }
+                };
+                let default_name = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+                let Some(name) = super::ask_text(
+                    &gettext("Import polar"),
+                    &gettext("Name for this polar:"),
+                    default_name,
+                    &gettext("Import"),
+                )
+                .await
+                else {
+                    return;
+                };
+                match isomar_app::polars::save_as(&app, &name, &parsed) {
+                    Ok(id) => {
+                        {
+                            let mut s = state.borrow_mut();
+                            s.list = isomar_app::polars::list(&app);
+                            show_polar(&app, &mut s, &id);
+                        }
+                        app.toast(&gettext_f("Polar {name} imported", &[("name", &name)]));
+                    }
+                    Err(e) => show_error(&gettext("Could not save the polar"), &e),
+                }
+                redraw();
+            });
+        });
+        actions.add_action(&action);
+    }
     {
         let action = gtk::gio::SimpleAction::new("set-from", Some(gtk::glib::VariantTy::STRING));
         let (state, redraw) = (state.clone(), redraw.clone());
