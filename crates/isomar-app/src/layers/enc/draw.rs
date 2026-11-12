@@ -70,8 +70,8 @@ pub(super) fn trace_data_limit(vi: &ViewInfo, cr: &cairo::Context, e: &CellSumma
 }
 
 /// Whether a feature shows at the view's scale 1:`denom`: what a cell gives a `SCAMIN` is hidden from smaller
-/// scales, as S-52 has it. The depth areas, land and coastline always show, soundings are thinned by their own
-/// rules, and marks and lights by theirs.
+/// scales, as S-52 has it. The depth areas, land and coastline always show, marks and lights are filtered
+/// by their own rules, and soundings without SCAMIN are thinned.
 pub(super) fn scamin_shows(f: &Feature, denom: f64) -> bool {
     let exempt = matches!(
         f.objl,
@@ -79,7 +79,6 @@ pub(super) fn scamin_shows(f: &Feature, denom: f64) -> bool {
             | obj::DRGARE
             | obj::LNDARE
             | obj::COALNE
-            | obj::SOUNDG
             | obj::LIGHTS
             | obj::LNDMRK
             | obj::BOYCAR

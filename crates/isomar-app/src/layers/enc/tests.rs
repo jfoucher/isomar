@@ -60,6 +60,9 @@ fn what_a_cell_gives_a_scamin_is_hidden_from_smaller_scales_except_the_basics() 
     assert!(scamin_shows(&f(obj::DEPARE, Some("22000")), 90_000.0), "depth areas always show");
     assert!(scamin_shows(&f(obj::LIGHTS, Some("22000")), 90_000.0), "marks and lights have their own rules");
     assert!(!scamin_shows(&f(obj::UWTROC, Some("22000")), 90_000.0));
+    assert!(scamin_shows(&f(obj::SOUNDG, Some("22000")), 20_000.0), "sounding at scale");
+    assert!(!scamin_shows(&f(obj::SOUNDG, Some("22000")), 90_000.0), "sounding with SCAMIN hidden at smaller scale");
+    assert!(scamin_shows(&f(obj::SOUNDG, None), 90_000.0), "sounding without SCAMIN always shows in scamin_shows");
 }
 
 #[test]
@@ -237,6 +240,41 @@ fn harbour_charts_do_not_show_when_zoomed_far_out() {
     assert!(!cell_visible(25_000, 500_000.0));
     assert!(cell_visible(0, 1.0e9), "no scale means always");
     assert!(cell_visible(1_500_000, 3_000_000.0), "overview cells span far");
+}
+
+#[test]
+fn cell_summary_visible_applies_scale_cutoffs_and_max_band() {
+    let dummy_cell = |name: &str, cscl: u32| CellSummary {
+        name: name.into(),
+        edition: 1,
+        update: 0,
+        issue_date: String::new(),
+        cscl,
+        bounds: Bounds::EMPTY,
+        features: 0,
+        warnings: 0,
+        cover: Default::default(),
+    };
+    let harbour = dummy_cell("FR571220.000", 10_000); // Band 5
+    let approach = dummy_cell("FR401010.000", 45_000); // Band 4
+    let coastal = dummy_cell("FR301010.000", 150_000); // Band 3
+
+    // Band 5 Harbour chart shows at harbor scales, but not when zoomed out to coastal scale (> 55,000)
+    assert!(cell_summary_visible(&harbour, 20_000.0, None));
+    assert!(!cell_summary_visible(&harbour, 60_000.0, None));
+
+    // Band 4 Approach chart shows at approach scales, but not at overview (> 220,000)
+    assert!(cell_summary_visible(&approach, 80_000.0, None));
+    assert!(!cell_summary_visible(&approach, 250_000.0, None));
+
+    // When max_band is limited to Band 3 (Coastal), Band 4 and Band 5 are hidden even at large scales
+    assert!(!cell_summary_visible(&harbour, 10_000.0, Some(3)));
+    assert!(!cell_summary_visible(&approach, 45_000.0, Some(3)));
+    assert!(cell_summary_visible(&coastal, 150_000.0, Some(3)));
+
+    // When max_band is limited to Band 4 (Approach), Band 5 is hidden but Band 4 is shown
+    assert!(!cell_summary_visible(&harbour, 10_000.0, Some(4)));
+    assert!(cell_summary_visible(&approach, 45_000.0, Some(4)));
 }
 
 #[test]

@@ -54,6 +54,48 @@ pub fn build(app: &Rc<AppState>) -> gtk::Widget {
             }
             body.append(&in_use);
 
+            let filter_group = adw::PreferencesGroup::builder().title(gettext("Chart scale filter")).build();
+            let options = [
+                gettext("Auto (All scales)"),
+                gettext("Up to Coastal (Band 3)"),
+                gettext("Up to Approach (Band 4)"),
+                gettext("Up to Harbour (Band 5)"),
+                gettext("All details (Band 6)"),
+            ];
+            let labels: Vec<&str> = options.iter().map(|l| l.as_str()).collect();
+            let combo = adw::ComboRow::builder()
+                .title(gettext("Maximum detail"))
+                .subtitle(gettext("Limits S-57 charts to this scale band and coarser"))
+                .model(&gtk::StringList::new(&labels))
+                .build();
+            let current_idx = match p.enc_max_band {
+                Some(3) => 1,
+                Some(4) => 2,
+                Some(5) => 3,
+                Some(6) => 4,
+                _ => 0,
+            };
+            combo.set_selected(current_idx);
+            {
+                let app = app.clone();
+                combo.connect_selected_notify(move |r| {
+                    let band = match r.selected() {
+                        1 => Some(3),
+                        2 => Some(4),
+                        3 => Some(5),
+                        4 => Some(6),
+                        _ => None,
+                    };
+                    let v = match band {
+                        Some(b) => serde_json::json!(b),
+                        None => serde_json::Value::Null,
+                    };
+                    isomar_app::api::call(&app, "settings_patch", &serde_json::json!({ "enc_max_band": v }));
+                });
+            }
+            filter_group.add(&combo);
+            body.append(&filter_group);
+
             // Where a chart already covers the view, only what was downloaded is listed, to update or remove.
             let here = if p.planning_only {
                 adw::PreferencesGroup::builder().title(gettext("For this area")).build()

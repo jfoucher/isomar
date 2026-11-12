@@ -121,9 +121,11 @@ pub fn install(app: &Rc<AppState>, canvas: &Engine, status: Status, settings: &S
     }
     {
         let (depth, enc) = (layers.depth.clone(), layers.enc.clone());
+        enc.set_max_band(settings.enc_max_band);
         app.on_settings(move |s| {
             depth.set_safety_depth(s.safety_depth);
             enc.set_safety_depth(s.safety_depth as f64);
+            enc.set_max_band(s.enc_max_band);
         });
     }
     if let Some(m) = crate::debug::palette() {

@@ -12,7 +12,7 @@ impl EncLayer {
         let view = vi.bounds();
         let (mut aids, mut lights) = (Vec::new(), Vec::new());
         let cells = self.cells.borrow();
-        for e in cells.iter().rev().filter(|e| cell_visible(e.meta.cscl, denom) && e.meta.bounds.intersects(&near)) {
+        for e in cells.iter().rev().filter(|e| self.entry_visible(&e.meta, denom) && e.meta.bounds.intersects(&near)) {
             let Some(cell) = e.cell.borrow().clone() else { continue };
             // Only what is drawn: each cell declutters its own lights in view, as `draw_cell` does.
             let in_view: Vec<Light> = cell
@@ -46,7 +46,7 @@ impl EncLayer {
         let near = aidinfo::click_bounds(vi, x, y, tol);
         let at = vi.position_at(x, y);
         let cells = self.cells.borrow();
-        for e in cells.iter().rev().filter(|e| cell_visible(e.meta.cscl, denom) && e.meta.bounds.intersects(&near)) {
+        for e in cells.iter().rev().filter(|e| self.entry_visible(&e.meta, denom) && e.meta.bounds.intersects(&near)) {
             let Some(cell) = e.cell.borrow().clone() else { continue };
             let found = cell
                 .cell
@@ -87,7 +87,7 @@ impl EncLayer {
         let near = aidinfo::click_bounds(vi, x, y, tol);
         let at = vi.position_at(x, y);
         let cells = self.cells.borrow();
-        for e in cells.iter().rev().filter(|e| cell_visible(e.meta.cscl, denom) && e.meta.bounds.intersects(&near)) {
+        for e in cells.iter().rev().filter(|e| self.entry_visible(&e.meta, denom) && e.meta.bounds.intersects(&near)) {
             let Some(cell) = e.cell.borrow().clone() else { continue };
             let here = cell.cell.features.iter().zip(&cell.bounds).filter(|(f, b)| b.intersects(&near.expanded(near.width())) && scamin_shows(f, denom)).map(|(f, _)| f);
             let found = crate::featureinfo::pick_all(vi, here, x, y, tol);

@@ -34,6 +34,8 @@ pub struct Page {
     pub folders: Vec<String>,
     /// No chart the user installed or added covers the view.
     pub planning_only: bool,
+    /// Maximum S-57 navigational purpose / usage band to display.
+    pub enc_max_band: Option<u8>,
 }
 
 /// Also starts checking the installed sources for updates; the page refreshes with the answers.
@@ -56,6 +58,7 @@ fn listed(app: &AppState) -> Page {
         rasters: app.bsb.borrow().as_ref().map_or(0, |b| b.charts().len()),
         folders: app.settings.borrow().chart_folders.clone(),
         planning_only,
+        enc_max_band: app.settings.borrow().enc_max_band,
     }
 }
 
@@ -123,26 +126,31 @@ fn in_use(app: &AppState) -> Vec<InUse> {
         out.push(InUse { name, kind: gettext("Raster chart (BSB/KAP)"), chips });
     }
     if app.canvas.layer_visible("enc")
-        && let Some((c, path)) = app.enc.borrow().as_ref().and_then(|e| e.in_use_at(centre.lon, centre.lat, denom))
+        && let Some(enc) = app.enc.borrow().as_ref()
     {
-        let mut chips = Vec::new();
-        if c.cscl > 0 {
-            chips.push(scale_chip(c.cscl));
+        for (c, path) in enc.all_in_use_at(centre.lon, centre.lat, denom) {
+            let mut chips = Vec::new();
+            let band = c.usage_band();
+            let band_title = c.usage_band_name();
+            chips.push(Chip::new(Icon::Zoom, format!("{band_title} (Band {band})"), gettext_f("{title} scale (S-57 Band {band})", &[("title", band_title), ("band", &band.to_string())])));
+            if c.cscl > 0 {
+                chips.push(scale_chip(c.cscl));
+            }
+            let edition = gettext_f("edition {n}", &[("n", &format!("{}.{}", c.edition, c.update))]);
+            chips.push(if c.issue_date.is_empty() {
+                Chip::with(Icon::Date, edition)
+            } else {
+                let date = date_text(&c.issue_date);
+                Chip::new(Icon::Date, format!("{date}, {edition}"), gettext_f("issued {date}, {edition}", &[("date", &date), ("edition", &edition)]))
+            });
+            if enlarged(c.cscl) {
+                chips.push(enlarged_chip());
+            }
+            if let Some(src) = path.as_deref().and_then(|p| source_of(app, p)) {
+                chips.push(source_chip(&src));
+            }
+            out.push(InUse { name: c.name.trim_end_matches(".000").to_string(), kind: gettext("Vector chart (S-57)"), chips });
         }
-        let edition = gettext_f("edition {n}", &[("n", &format!("{}.{}", c.edition, c.update))]);
-        chips.push(if c.issue_date.is_empty() {
-            Chip::with(Icon::Date, edition)
-        } else {
-            let date = date_text(&c.issue_date);
-            Chip::new(Icon::Date, format!("{date}, {edition}"), gettext_f("issued {date}, {edition}", &[("date", &date), ("edition", &edition)]))
-        });
-        if enlarged(c.cscl) {
-            chips.push(enlarged_chip());
-        }
-        if let Some(src) = path.as_deref().and_then(|p| source_of(app, p)) {
-            chips.push(source_chip(&src));
-        }
-        out.push(InUse { name: c.name.trim_end_matches(".000").to_string(), kind: gettext("Vector chart (S-57)"), chips });
     }
     out
 }
