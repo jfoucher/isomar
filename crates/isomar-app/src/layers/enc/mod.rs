@@ -198,6 +198,9 @@ pub struct EncLayer {
     cells: RefCell<Vec<Entry>>,
     safety: StdCell<f64>,
     max_band: StdCell<Option<u8>>,
+    pinned_cell: RefCell<Option<String>>,
+    bsb: RefCell<Option<Rc<super::bsb::BsbLayer>>>,
+    bsb_shown: StdCell<bool>,
     changes: Changes,
     /// Where the changes the next `bump` shows are: `Some(None)` anywhere.
     touched: RefCell<Option<Option<Bounds>>>,
@@ -226,6 +229,9 @@ impl EncLayer {
             cells: RefCell::new(Vec::new()),
             safety: StdCell::new(5.0),
             max_band: StdCell::new(None),
+            pinned_cell: RefCell::new(None),
+            bsb: RefCell::new(None),
+            bsb_shown: StdCell::new(true),
             changes: Changes::default(),
             touched: RefCell::new(None),
             redraw,
@@ -352,8 +358,38 @@ impl EncLayer {
         self.max_band.get()
     }
 
-    /// Whether an entry is visible at `denom` given its scale and usage band constraints.
+    /// Pins rendering to a single S-57 cell by name (e.g. `"FR571220"`), or `None` for automatic quilting.
+    pub fn set_pinned_cell(&self, name: Option<String>) {
+        let name = name.map(|n| n.trim_end_matches(".000").to_string()).filter(|n| !n.is_empty());
+        if *self.pinned_cell.borrow() != name {
+            *self.pinned_cell.borrow_mut() = name;
+            self.touch(None);
+            self.bump();
+        }
+    }
+
+    pub fn pinned_cell(&self) -> Option<String> {
+        self.pinned_cell.borrow().clone()
+    }
+
+    /// Associates the raster layer so `EncLayer` can skip rendering tiles that are completely covered by an opaque raster chart.
+    pub fn set_bsb(&self, bsb: Rc<super::bsb::BsbLayer>) {
+        *self.bsb.borrow_mut() = Some(bsb);
+    }
+
+    pub fn set_bsb_shown(&self, shown: bool) {
+        if self.bsb_shown.get() != shown {
+            self.bsb_shown.set(shown);
+            self.touch(None);
+            self.bump();
+        }
+    }
+
+    /// Whether an entry is visible at `denom` given its scale, usage band, and pinned-cell constraints.
     pub fn entry_visible(&self, meta: &CellSummary, denom: f64) -> bool {
+        if let Some(ref target) = *self.pinned_cell.borrow() {
+            return meta.name.trim_end_matches(".000") == target;
+        }
         cell_summary_visible(meta, denom, self.max_band.get())
     }
 
@@ -411,13 +447,14 @@ impl EncLayer {
         Some(((*e.meta).clone(), e.path.clone()))
     }
 
-    /// All cells covering (`lon`, `lat`) that are visible at `denom`, fine first.
+    /// All cells covering (`lon`, `lat`) that are visible at `denom` (ignoring `pinned_cell`), fine first.
     pub fn all_in_use_at(&self, lon: f64, lat: f64, denom: f64) -> Vec<(CellSummary, Option<PathBuf>)> {
         let cells = self.cells.borrow();
+        let max_band = self.max_band.get();
         cells
             .iter()
             .rev()
-            .filter(|e| self.entry_visible(&e.meta, denom) && e.meta.bounds.contains([lon, lat]) && (e.meta.cover.covered.is_empty() || e.meta.cover.contains([lon, lat])))
+            .filter(|e| cell_summary_visible(&e.meta, denom, max_band) && e.meta.bounds.contains([lon, lat]) && (e.meta.cover.covered.is_empty() || e.meta.cover.contains([lon, lat])))
             .map(|e| ((*e.meta).clone(), e.path.clone()))
             .collect()
     }
@@ -731,6 +768,12 @@ impl EncLayer {
             return None;
         }
         let vi = &area.vi;
+        if self.pinned_cell.borrow().is_none()
+            && self.bsb_shown.get()
+            && self.bsb.borrow().as_ref().is_some_and(|b| b.in_use_at(vi, vi.view.center).is_some())
+        {
+            return None;
+        }
         let view = vi.bounds();
         let denom = view_scale(vi.view.center.lat, vi.zoom());
         let safety = self.safety.get();

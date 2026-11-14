@@ -14,11 +14,13 @@ use std::rc::Rc;
 /// A chart drawn at the centre of the view.
 #[derive(Serialize, Clone, Debug, PartialEq)]
 pub struct InUse {
+    pub id: String,
     pub name: String,
     /// "Vector chart (S-57)".
     pub kind: String,
     /// Its scale, date and edition, whether it is shown enlarged, where it comes from.
     pub chips: Vec<Chip>,
+    pub pinned: bool,
 }
 
 #[derive(Serialize, Clone, Debug, PartialEq, Default)]
@@ -123,11 +125,12 @@ fn in_use(app: &AppState) -> Vec<InUse> {
         if let Some(src) = source_of(app, &c.path) {
             chips.push(source_chip(&src));
         }
-        out.push(InUse { name, kind: gettext("Raster chart (BSB/KAP)"), chips });
+        out.push(InUse { id: String::new(), name, kind: gettext("Raster chart (BSB/KAP)"), chips, pinned: false });
     }
     if app.canvas.layer_visible("enc")
         && let Some(enc) = app.enc.borrow().as_ref()
     {
+        let pinned_name = enc.pinned_cell();
         for (c, path) in enc.all_in_use_at(centre.lon, centre.lat, denom) {
             let mut chips = Vec::new();
             let band = c.usage_band();
@@ -149,7 +152,9 @@ fn in_use(app: &AppState) -> Vec<InUse> {
             if let Some(src) = path.as_deref().and_then(|p| source_of(app, p)) {
                 chips.push(source_chip(&src));
             }
-            out.push(InUse { name: c.name.trim_end_matches(".000").to_string(), kind: gettext("Vector chart (S-57)"), chips });
+            let id = c.name.trim_end_matches(".000").to_string();
+            let pinned = pinned_name.as_deref() == Some(id.as_str());
+            out.push(InUse { id: id.clone(), name: id, kind: gettext("Vector chart (S-57)"), chips, pinned });
         }
     }
     out

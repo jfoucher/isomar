@@ -50,7 +50,25 @@ pub fn build(app: &Rc<AppState>) -> gtk::Widget {
             for c in &p.in_use {
                 let mut line = vec![isomar_app::chips::Chip::plain(c.kind.clone())];
                 line.extend(c.chips.iter().cloned());
-                in_use.add(&crate::ui::chips::row_lines(None, &c.name, &[&line], true));
+                let row = crate::ui::chips::row_lines(None, &c.name, &[&line], true);
+                if !c.id.is_empty() {
+                    let pin = gtk::ToggleButton::builder()
+                        .icon_name("view-pin-symbolic")
+                        .active(c.pinned)
+                        .valign(gtk::Align::Center)
+                        .css_classes(["flat"])
+                        .tooltip_text(if c.pinned { gettext("Show all charts (unpin)") } else { gettext("Show only this chart") })
+                        .build();
+                    let (app2, id, was_pinned) = (app.clone(), c.id.clone(), c.pinned);
+                    pin.connect_toggled(move |_| {
+                        if let Some(enc) = app2.enc.borrow().as_ref() {
+                            enc.set_pinned_cell(if was_pinned { None } else { Some(id.clone()) });
+                        }
+                        app2.refresh();
+                    });
+                    row.add_suffix(&pin);
+                }
+                in_use.add(&row);
             }
             body.append(&in_use);
 
