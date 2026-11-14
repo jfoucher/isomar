@@ -59,6 +59,7 @@ pub fn install(canvas: &Engine, status: Status, chart_folders: &[String]) -> Cha
     enc.set_relief(relief.clone());
     let bsb = Rc::new(BsbLayer::new(redraw));
     bsb.set_base(land.clone());
+    enc.set_bsb(bsb.clone());
 
     canvas.add_layer(depth.clone());
     canvas.add_layer(Rc::new(SoundingLayer::new(depth.clone()).with_names(towns.clone())));
@@ -78,6 +79,8 @@ pub fn install(canvas: &Engine, status: Status, chart_folders: &[String]) -> Cha
     // Hidden chart cells leave their areas to the marks they would have replaced.
     let a = aids.clone();
     canvas.follow_layer_visible("enc", move |shown| a.set_enc_shown(shown));
+    let e = enc.clone();
+    canvas.follow_layer_visible("bsb", move |shown| e.set_bsb_shown(shown));
     load_coast(land.clone(), status.clone());
     load_aids(aids.clone(), status.clone());
     load_grids(depth.clone(), status.clone());

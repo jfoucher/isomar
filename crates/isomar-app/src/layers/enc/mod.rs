@@ -54,6 +54,29 @@ pub fn cell_visible(cscl: u32, view_denominator: f64) -> bool {
     cscl == 0 || view_denominator <= cscl as f64 * 3.0
 }
 
+/// A cell is drawn if it meets both compilation scale rules and navigational purpose / usage band limits.
+pub fn cell_summary_visible(meta: &CellSummary, view_denominator: f64, max_band: Option<u8>) -> bool {
+    let band = meta.usage_band();
+    if let Some(limit) = max_band
+        && band > limit
+    {
+        return false;
+    }
+    // Scale cutoffs per band so harbour and berthing charts don't clutter coastal views:
+    let max_denom_for_band = match band {
+        6 => 15_000.0,
+        5 => 55_000.0,
+        4 => 220_000.0,
+        3 => 850_000.0,
+        2 => 3_500_000.0,
+        _ => f64::INFINITY,
+    };
+    if view_denominator > max_denom_for_band {
+        return false;
+    }
+    cell_visible(meta.cscl, view_denominator)
+}
+
 /// Fill colour of a depth area: the tint the depth grids shade the middle of its range with, so that
 /// a cell's edge does not show against grid shading or a coarser cell; the safety contour is the
 /// heavy line. Drying ground is green.
@@ -174,6 +197,10 @@ pub struct ChartVariation {
 pub struct EncLayer {
     cells: RefCell<Vec<Entry>>,
     safety: StdCell<f64>,
+    max_band: StdCell<Option<u8>>,
+    pinned_cell: RefCell<Option<String>>,
+    bsb: RefCell<Option<Rc<super::bsb::BsbLayer>>>,
+    bsb_shown: StdCell<bool>,
     changes: Changes,
     /// Where the changes the next `bump` shows are: `Some(None)` anywhere.
     touched: RefCell<Option<Option<Bounds>>>,
@@ -201,6 +228,10 @@ impl EncLayer {
         Rc::new_cyclic(|me| EncLayer {
             cells: RefCell::new(Vec::new()),
             safety: StdCell::new(5.0),
+            max_band: StdCell::new(None),
+            pinned_cell: RefCell::new(None),
+            bsb: RefCell::new(None),
+            bsb_shown: StdCell::new(true),
             changes: Changes::default(),
             touched: RefCell::new(None),
             redraw,
@@ -241,7 +272,7 @@ impl EncLayer {
         let before = cells.len();
         for (path, meta) in found {
             if seen.insert((meta.name.clone(), meta.update)) {
-                let shown = self.last_view.get().is_none_or(|(view, denom)| cell_visible(meta.cscl, denom) && meta.bounds.intersects(&view));
+                let shown = self.last_view.get().is_none_or(|(view, denom)| self.entry_visible(&meta, denom) && meta.bounds.intersects(&view));
                 if shown {
                     self.touch(Some(meta.bounds));
                 }
@@ -312,6 +343,56 @@ impl EncLayer {
         self.bump();
     }
 
+    /// Sets the maximum S-57 navigational purpose / usage band to display (1 to 6).
+    /// `None` displays all bands up to their scale cutoffs.
+    pub fn set_max_band(&self, max_band: Option<u8>) {
+        let max_band = max_band.filter(|&b| (1..=6).contains(&b));
+        if self.max_band.get() != max_band {
+            self.max_band.set(max_band);
+            self.touch(None);
+            self.bump();
+        }
+    }
+
+    pub fn max_band(&self) -> Option<u8> {
+        self.max_band.get()
+    }
+
+    /// Pins rendering to a single S-57 cell by name (e.g. `"FR571220"`), or `None` for automatic quilting.
+    pub fn set_pinned_cell(&self, name: Option<String>) {
+        let name = name.map(|n| n.trim_end_matches(".000").to_string()).filter(|n| !n.is_empty());
+        if *self.pinned_cell.borrow() != name {
+            *self.pinned_cell.borrow_mut() = name;
+            self.touch(None);
+            self.bump();
+        }
+    }
+
+    pub fn pinned_cell(&self) -> Option<String> {
+        self.pinned_cell.borrow().clone()
+    }
+
+    /// Associates the raster layer so `EncLayer` can skip rendering tiles that are completely covered by an opaque raster chart.
+    pub fn set_bsb(&self, bsb: Rc<super::bsb::BsbLayer>) {
+        *self.bsb.borrow_mut() = Some(bsb);
+    }
+
+    pub fn set_bsb_shown(&self, shown: bool) {
+        if self.bsb_shown.get() != shown {
+            self.bsb_shown.set(shown);
+            self.touch(None);
+            self.bump();
+        }
+    }
+
+    /// Whether an entry is visible at `denom` given its scale, usage band, and pinned-cell constraints.
+    pub fn entry_visible(&self, meta: &CellSummary, denom: f64) -> bool {
+        if let Some(ref target) = *self.pinned_cell.borrow() {
+            return meta.name.trim_end_matches(".000") == target;
+        }
+        cell_summary_visible(meta, denom, self.max_band.get())
+    }
+
     /// The magnetic variation a chart cell in memory gives at (`lon`, `lat`), from the finest cell that has any
     /// there: the `MAGVAR` area that holds the place, else the nearest `MAGVAR` point in the cell.
     pub fn variation_at(&self, lon: f64, lat: f64) -> Option<ChartVariation> {
@@ -361,9 +442,21 @@ impl EncLayer {
         let cells = self.cells.borrow();
         // Kept coarse first, so the last that shows here is drawn over the others.
         let e = cells.iter().rev().find(|e| {
-            cell_visible(e.meta.cscl, denom) && e.meta.bounds.contains([lon, lat]) && (e.meta.cover.covered.is_empty() || e.meta.cover.contains([lon, lat]))
+            self.entry_visible(&e.meta, denom) && e.meta.bounds.contains([lon, lat]) && (e.meta.cover.covered.is_empty() || e.meta.cover.contains([lon, lat]))
         })?;
         Some(((*e.meta).clone(), e.path.clone()))
+    }
+
+    /// All cells covering (`lon`, `lat`) that are visible at `denom` (ignoring `pinned_cell`), fine first.
+    pub fn all_in_use_at(&self, lon: f64, lat: f64, denom: f64) -> Vec<(CellSummary, Option<PathBuf>)> {
+        let cells = self.cells.borrow();
+        let max_band = self.max_band.get();
+        cells
+            .iter()
+            .rev()
+            .filter(|e| cell_summary_visible(&e.meta, denom, max_band) && e.meta.bounds.contains([lon, lat]) && (e.meta.cover.covered.is_empty() || e.meta.cover.contains([lon, lat])))
+            .map(|e| ((*e.meta).clone(), e.path.clone()))
+            .collect()
     }
 
     /// Where each non-empty cell has data, with its scale.
@@ -675,11 +768,17 @@ impl EncLayer {
             return None;
         }
         let vi = &area.vi;
+        if self.pinned_cell.borrow().is_none()
+            && self.bsb_shown.get()
+            && self.bsb.borrow().as_ref().is_some_and(|b| b.in_use_at(vi, vi.view.center).is_some())
+        {
+            return None;
+        }
         let view = vi.bounds();
         let denom = view_scale(vi.view.center.lat, vi.zoom());
         let safety = self.safety.get();
         self.last_view.set(Some((view, denom)));
-        let mut shown: Vec<&Entry> = cells.iter().filter(|e| cell_visible(e.meta.cscl, denom) && e.meta.bounds.intersects(&view)).collect();
+        let mut shown: Vec<&Entry> = cells.iter().filter(|e| self.entry_visible(&e.meta, denom) && e.meta.bounds.intersects(&view)).collect();
         if shown.is_empty() {
             return None;
         }

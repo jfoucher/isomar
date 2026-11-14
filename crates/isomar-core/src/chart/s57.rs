@@ -254,6 +254,14 @@ impl Cell {
             cover: self.coverage(),
         }
     }
+
+    pub fn usage_band(&self) -> u8 {
+        usage_band(&self.name, self.cscl)
+    }
+
+    pub fn usage_band_name(&self) -> &'static str {
+        usage_band_name(self.usage_band())
+    }
 }
 
 /// A cell with its features left out; see [`Cell::summary`].
@@ -270,6 +278,50 @@ pub struct CellSummary {
     /// How many warnings reading it raised.
     pub warnings: usize,
     pub cover: Coverage,
+}
+
+impl CellSummary {
+    pub fn usage_band(&self) -> u8 {
+        usage_band(&self.name, self.cscl)
+    }
+
+    pub fn usage_band_name(&self) -> &'static str {
+        usage_band_name(self.usage_band())
+    }
+}
+
+/// Navigational purpose (usage band 1 to 6) as indicated by the 3rd character
+/// of the standard 8-character S-57 cell name (e.g. 'FR5...', 'US4...'), or inferred
+/// from compilation scale `cscl`.
+pub fn usage_band(name: &str, cscl: u32) -> u8 {
+    let stem = name.split('.').next().unwrap_or(name);
+    if stem.len() >= 3 {
+        let b = stem.as_bytes()[2];
+        if (b'1'..=b'6').contains(&b) {
+            return b - b'0';
+        }
+    }
+    match cscl {
+        cs if cs > 1_499_999 => 1,
+        cs if cs >= 350_000 => 2,
+        cs if cs >= 90_000 => 3,
+        cs if cs >= 22_000 => 4,
+        cs if cs >= 4_000 => 5,
+        cs if cs > 0 => 6,
+        _ => 5,
+    }
+}
+
+pub fn usage_band_name(band: u8) -> &'static str {
+    match band {
+        1 => "Overview",
+        2 => "General",
+        3 => "Coastal",
+        4 => "Approach",
+        5 => "Harbour",
+        6 => "Berthing",
+        _ => "Chart",
+    }
 }
 
 /// The area a cell has data for: the polygons of its coverage objects, less
@@ -975,4 +1027,24 @@ mod tests {
             eprintln!("{} coverage: {} polygon(s), {} hole(s), mean point inside: {}", cell.name, c.covered.len(), c.holes.len(), c.contains(inside));
         }
     }
+
+    #[test]
+    fn usage_bands_are_derived_from_name_or_scale() {
+        assert_eq!(usage_band("FR571220.000", 10_000), 5);
+        assert_eq!(usage_band("US1WC01M", 2_000_000), 1);
+        assert_eq!(usage_band("GB200001", 500_000), 2);
+        assert_eq!(usage_band("DE300001", 150_000), 3);
+        assert_eq!(usage_band("NO400001", 45_000), 4);
+        assert_eq!(usage_band("CA600001", 2_000), 6);
+        // Fallback to compilation scale when name has no standard band character
+        assert_eq!(usage_band("CUSTOM_CHART", 2_000_000), 1);
+        assert_eq!(usage_band("CUSTOM_CHART", 500_000), 2);
+        assert_eq!(usage_band("CUSTOM_CHART", 150_000), 3);
+        assert_eq!(usage_band("CUSTOM_CHART", 45_000), 4);
+        assert_eq!(usage_band("CUSTOM_CHART", 10_000), 5);
+        assert_eq!(usage_band("CUSTOM_CHART", 2_000), 6);
+        assert_eq!(usage_band_name(5), "Harbour");
+        assert_eq!(usage_band_name(3), "Coastal");
+    }
 }
+

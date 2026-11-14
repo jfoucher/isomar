@@ -103,6 +103,9 @@ pub struct Settings {
     pub boat_performance_pct: Option<f64>,
     /// Currents: whether routes use them, and the tidal atlases installed.
     pub currents: CurrentPrefs,
+    /// Maximum S-57 navigational purpose / usage band (1 to 6) to display.
+    /// None (default) displays all bands up to their scale cutoffs.
+    pub enc_max_band: Option<u8>,
 }
 
 /// What the user chose about currents.
@@ -182,6 +185,7 @@ impl Default for Settings {
             polar_performance_pct: Default::default(),
             boat_performance_pct: None,
             currents: CurrentPrefs::default(),
+            enc_max_band: None,
         }
     }
 }

@@ -119,6 +119,45 @@ pub fn open(app: &Rc<AppState>) {
     let chart = add_page("chart", &gettext("Chart"), "isomar-charts-symbolic");
     let g = group(&chart, &gettext("Chart"), "");
     g.add(&choice(app, &gettext("Chart style"), "chart_style", &[("paper", gettext("Paper")), ("ecdis", gettext("ECDIS"))], &s.chart_style));
+    let scale_filter = adw::ComboRow::builder()
+        .title(gettext("Maximum detail (S-57)"))
+        .subtitle(gettext("Limits S-57 charts to this scale band and coarser"))
+        .model(&gtk::StringList::new(&[
+            &gettext("Auto (All scales)"),
+            &gettext("Up to Coastal (Band 3)"),
+            &gettext("Up to Approach (Band 4)"),
+            &gettext("Up to Harbour (Band 5)"),
+            &gettext("All details (Band 6)"),
+        ]))
+        .build();
+    let current_idx = match s.enc_max_band {
+        Some(3) => 1,
+        Some(4) => 2,
+        Some(5) => 3,
+        Some(6) => 4,
+        _ => 0,
+    };
+    scale_filter.set_selected(current_idx);
+    {
+        let app = Rc::downgrade(app);
+        scale_filter.connect_selected_notify(move |r| {
+            if let Some(app) = app.upgrade() {
+                let band = match r.selected() {
+                    1 => Some(3),
+                    2 => Some(4),
+                    3 => Some(5),
+                    4 => Some(6),
+                    _ => None,
+                };
+                let v = match band {
+                    Some(b) => serde_json::json!(b),
+                    None => serde_json::Value::Null,
+                };
+                patch(&app, json!({ "enc_max_band": v }));
+            }
+        });
+    }
+    g.add(&scale_filter);
     g.add(&switch(app, &gettext("Light sectors at their full range"), &gettext("Otherwise drawn at a fixed size"), "full_sectors", s.full_sectors));
     g.add(&number(app, &gettext("Safety contour"), &gettext("m"), "safety_depth", (1.0, 50.0, 1.0), 0, f64::from(s.safety_depth)));
     g.add(&number(app, &gettext("Course vector"), &gettext("minutes"), "vector_minutes", (1.0, 30.0, 1.0), 0, s.vector_minutes));
