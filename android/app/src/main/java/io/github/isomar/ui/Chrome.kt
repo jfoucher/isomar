@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material.icons.outlined.WarningAmber
@@ -129,7 +130,10 @@ fun HintCard(h: Hint) {
     }
 }
 
-/** Under way, at the top: the next waypoint and the figures to it, and Skip. */
+/**
+ * Under way, at the top: the next waypoint and the figures to it, then Skip and Stop. The pages are hidden
+ * under way (the sheet on a phone, the panel on a tablet), so Stop must be here or navigation cannot be ended.
+ */
 @Composable
 fun NavigatingCard(card: NavCard) {
     FloatingCard(Modifier.fillMaxWidth()) {
@@ -142,7 +146,6 @@ fun NavigatingCard(card: NavCard) {
                     Text("NEXT WAYPOINT", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = c(Tok.textMuted))
                     Text(card.name, fontSize = 19.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                FilledTonalButtonIcon(enabled = card.canSkip, onClick = { Model.send("underway_skip") })
             }
             Row(Modifier.fillMaxWidth()) {
                 for (cell in card.cells.take(4)) {
@@ -152,14 +155,15 @@ fun NavigatingCard(card: NavCard) {
                     }
                 }
             }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilledTonalButton(onClick = { Model.send("underway_skip") }, enabled = card.canSkip, modifier = Modifier.weight(1f).height(Size.hitMinAndroid)) {
+                    Icon(Icons.Filled.SkipNext, null, Modifier.size(18.dp)); Spacer(Modifier.size(6.dp)); Text("Skip")
+                }
+                FilledTonalButton(onClick = { Model.send("underway_stop") }, modifier = Modifier.weight(1f).height(Size.hitMinAndroid)) {
+                    Icon(Icons.Filled.Stop, null, Modifier.size(18.dp)); Spacer(Modifier.size(6.dp)); Text("Stop")
+                }
+            }
         }
-    }
-}
-
-@Composable
-private fun FilledTonalButtonIcon(enabled: Boolean, onClick: () -> Unit) {
-    androidx.compose.material3.FilledTonalIconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(Size.hitMinAndroid)) {
-        Icon(Icons.Filled.SkipNext, "Skip to the next waypoint")
     }
 }
 
